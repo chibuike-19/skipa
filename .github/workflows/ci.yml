@@ -109,12 +109,16 @@ jobs:
           "$RUNNER_TEMP/venv/bin/pip" install --quiet pyyaml==6.0.3 jsonschema==4.25.1
           echo "$RUNNER_TEMP/venv/bin" >> "$GITHUB_PATH"
       - name: Pack fixtures validate against the contract
+        # The fixtures now live in packages/mocks (moved by the frontend agent, brief §5).
         run: |
           mkdir -p "$RUNNER_TEMP/fx/mocks" "$RUNNER_TEMP/fx/api"
-          cp -r docs/architecture-pack/mocks/fixtures "$RUNNER_TEMP/fx/mocks/"
-          cp docs/architecture-pack/mocks/validate_fixtures.py "$RUNNER_TEMP/fx/mocks/"
+          cp -r packages/mocks/fixtures "$RUNNER_TEMP/fx/mocks/"
+          cp packages/mocks/validate_fixtures.py "$RUNNER_TEMP/fx/mocks/"
           cp api/openapi.v1.yaml "$RUNNER_TEMP/fx/api/"
           python3 -I "$RUNNER_TEMP/fx/mocks/validate_fixtures.py"
+      - name: Mock handlers validate against the contract (every scenario)
+        # A contract change that breaks a frontend mock fails here, on the PR that makes it.
+        run: pnpm mocks:validate
       - name: Contract changes need the contract-change label
         if: github.event_name == 'pull_request'
         env:
