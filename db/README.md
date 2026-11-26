@@ -17,3 +17,20 @@ the two runtime roles; on servers infra/ansible creates them.
 Rules (brief §7, AD §7.4): new migrations are new files, never edits; expand → migrate → contract;
 triggers, RLS policies, partial indexes and generated columns are hand-written SQL. The Drizzle
 schema (`apps/api/src/db/schema.ts`) must match the database; `pnpm test:int` checks it.
+
+## Seed (`pnpm db:seed`)
+
+Repeatable (deterministic IDs, `ON CONFLICT DO NOTHING`). Uses the pack fixtures' IDs and values where
+they overlap (Adunni Mart, Lekki branch, Drinks/Alcoholic drinks, three fixture products).
+
+| Seeded now                                                               | Waiting for                                           |
+| ------------------------------------------------------------------------ | ----------------------------------------------------- |
+| 9 standard categories, platform settings, 5 feature flags, star rules v1 | —                                                     |
+| Adunni Mart (LK, IK) and Harbour Grocers (VI), branch settings, QR codes | —                                                     |
+| Staff: one per role per organisation, super admin `tolu@skipa.test`      | —                                                     |
+| ~1,300 products per organisation, priced per branch, every edge case     | —                                                     |
+| 50 shoppers (encrypted phone/email), consents, all five avatars          | —                                                     |
+| 30 days of activity                                                      | each milestone seeds its own area (lead, 26 Nov 2026) |
+| Branding versions                                                        | contrast checker (branding module)                    |
+| Notification templates, 30 platform FAQs                                 | source text (question to the lead)                    |
+| Stars, visited stores                                                    | visits (M2/M3)                                        |

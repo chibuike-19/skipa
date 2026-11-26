@@ -57,7 +57,10 @@ Local branches, stacked, merge in this order: `chore/SKP-0-bootstrap` → `feat/
   them at runtime, so history holds no secret-shaped literal) and one Semgrep CORS rule (`nosemgrep` with reason; covered
   by integration tests). SOPS layout documented in `infra/secrets/README.md`; encrypted files
   wait for the lead's age public key.
-- Next: seed; staging playbook.
+- PR 7 (`feat/SKP-6-seed`): done. `pnpm db:seed` (repeatable, refuses production) plus PII
+  crypto (AES-256-GCM, HMAC lookups) that M1 identity will reuse. In CI: migrate + seed on an
+  empty database. See db/README.md for what is seeded and what waits.
+- Next: staging playbook (written and checked locally; not provisioned).
 - Decision: pg-boss is deferred to M1, where the first jobs arrive. `/health/ready` reports the
   queue as `not_installed`.
 
@@ -71,6 +74,17 @@ Local branches, stacked, merge in this order: `chore/SKP-0-bootstrap` → `feat/
 - `/docs` OpenAPI UI needs `@fastify/swagger-ui`, which is not in the approved stack. Default: no
   UI; serve the YAML file.
 - Draft user copy for SYS-409/410/426/429/003 (in errors.ts) needs the frontend's review.
+
+- **Standard categories:** the AD and brief say 10; PRD v2.0 §7.2 lists 9 (v1.0 lists 6).
+  Which is the tenth (design canvas?)? Default: seed the 9 from PRD v2.0; the list is super
+  admin data, so adding one later is a data change.
+- **Fixture barcodes:** all three barcodes in `catalogue.json` have invalid EAN-13 check digits.
+  The brief asks for valid ones and for seed values to match fixtures. Default: the seed reuses
+  the fixture barcodes for those three products; every generated barcode is valid. The frontend
+  agent owns the fixtures; worth fixing there.
+- **Templates and FAQs:** the seed should include notification templates v1 and 30 platform FAQs,
+  but no document gives their text. Default: templates arrive with the milestone that sends each
+  message; FAQs with the support module (M4), from text you or the canvas provide.
 
 ### Blocked
 

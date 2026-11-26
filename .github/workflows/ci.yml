@@ -78,6 +78,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Migrate an empty database
         run: pnpm db:migrate
+      - name: Seed it (M0 AC; throwaway keys generated per run)
+        run: |
+          PII_ENCRYPTION_KEY="$(openssl rand -base64 32)" PII_HMAC_KEY="$(openssl rand -base64 32)" pnpm db:seed
       - run: pnpm test:int
 
   contract:
