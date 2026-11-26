@@ -1,10 +1,13 @@
 # CI (AD §12.4): install, format, lint, typecheck, unit tests, integration tests on Postgres 18.7,
-# and the PR-title commit check. Still to come in M0: the contract check, Gitleaks, Semgrep,
+# the contract check, and the PR-title commit check. Still to come in M0: Gitleaks, Semgrep,
 # pnpm audit and Trivy. The frontend agent adds its jobs through PRs.
 name: ci
 
 on:
   pull_request:
+    # labeled/unlabeled: re-run the contract job when `contract-change` is added or removed.
+    # edited: re-run the PR-title check when the title changes.
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
   push:
     branches: [main]
 
@@ -76,6 +79,54 @@ jobs:
       - name: Migrate an empty database
         run: pnpm db:migrate
       - run: pnpm test:int
+
+  contract:
+    # Brief §5: the committed contract must equal what packages/contracts generates, the pack
+    # fixtures must validate against it, and any change in meaning versus the base branch needs
+    # the `contract-change` label (and the other agent's approval).
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          # pnpm comes from corepack in a later step; the store is cached by hand.
+          package-manager-cache: false
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - name: Generated contract matches the committed file
+        run: pnpm contract:check
+      - name: Python tools for contract checks
+        # A venv, not pip --user: `python3 -I` below skips the user site-packages directory.
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet pyyaml==6.0.3 jsonschema==4.25.1
+          echo "$RUNNER_TEMP/venv/bin" >> "$GITHUB_PATH"
+      - name: Pack fixtures validate against the contract
+        run: |
+          mkdir -p "$RUNNER_TEMP/fx/mocks" "$RUNNER_TEMP/fx/api"
+          cp -r docs/architecture-pack/mocks/fixtures "$RUNNER_TEMP/fx/mocks/"
+          cp docs/architecture-pack/mocks/validate_fixtures.py "$RUNNER_TEMP/fx/mocks/"
+          cp api/openapi.v1.yaml "$RUNNER_TEMP/fx/api/"
+          python3 -I "$RUNNER_TEMP/fx/mocks/validate_fixtures.py"
+      - name: Contract changes need the contract-change label
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          HAS_LABEL: ${{ contains(github.event.pull_request.labels.*.name, 'contract-change') }}
+        run: |
+          git show "origin/${BASE_REF}:api/openapi.v1.yaml" > "$RUNNER_TEMP/base.yaml"
+          if python3 -I scripts/contract_diff.py "$RUNNER_TEMP/base.yaml" api/openapi.v1.yaml; then
+            echo "No change in meaning."
+          elif [ "$HAS_LABEL" = "true" ]; then
+            echo "::notice::Contract changed; labelled contract-change. The other agent must approve."
+          else
+            echo "::error::api/openapi.v1.yaml changed in meaning. Add the contract-change label and get the other agent's approval."
+            exit 1
+          fi
 
   pr-title:
     # PRs are squash-merged, so the PR title becomes the commit on main (AD §5.3).

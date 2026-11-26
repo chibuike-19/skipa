@@ -20,7 +20,9 @@
     "db:down": "docker compose -f infra/compose/dev.yaml down",
     "db:migrate": "pnpm --filter @skipa/api db:migrate",
     "test:int": "turbo run test:int",
-    "local:setup": "pnpm local:env && pnpm db:up && pnpm db:migrate"
+    "local:setup": "pnpm local:env && pnpm db:up && pnpm db:migrate",
+    "contract:build": "pnpm --filter @skipa/contracts contract:build",
+    "contract:check": "pnpm --filter @skipa/contracts contract:check"
   },
   "devDependencies": {
     "@commitlint/cli": "21.2.4",

@@ -45,8 +45,13 @@ Local branches, stacked, merge in this order: `chore/SKP-0-bootstrap` → `feat/
   envelope, RLS transaction helper, idempotency, Postgres rate limits (migration 0002, ADR-34),
   SSE hub, CORS/security headers, Sentry, health routes. 22 unit tests plus 40 new integration
   tests (73 integration in total) pass. The real server was started locally and checked with curl.
-- Next: contracts Zod pipeline + `contract:check`; CI security scans + SOPS layout; seed;
-  staging playbook.
+- PR 5 (contracts, `feat/SKP-4-contracts`): done. Zod source for all 177 operations and 148
+  schemas; `contract:build`/`contract:check`; the generated YAML has no semantic differences
+  from the agreed file; all 9 pack fixtures validate against the YAML and against the Zod schemas
+  at runtime; CI contract job with the `contract-change` label rule (ADR-35). The YAML layout
+  changed once with the same meaning: label this PR contract-change (formatting only) for the
+  frontend agent.
+- Next: CI security scans + SOPS layout; seed; staging playbook.
 - Decision: pg-boss is deferred to M1, where the first jobs arrive. `/health/ready` reports the
   queue as `not_installed`.
 
