@@ -1,0 +1,55 @@
+// Container logs → Loki (AD §10.1). Docker writes container output to journald (logging driver in
+// infra/compose/staging.yaml); Alloy reads the journal, so it needs no Docker socket.
+// Pino lines are JSON: request_id, route, code and the rest stay in the line and are queried with
+// `| json` in Grafana. Only low-cardinality fields become labels.
+
+loki.source.journal "containers" {
+  path          = "/var/log/journal"
+  matches       = "_TRANSPORT=journal"
+  relabel_rules = loki.relabel.containers.rules
+  forward_to    = [loki.process.containers.receiver]
+  labels        = { job = "docker" }
+}
+
+loki.relabel "containers" {
+  forward_to = []
+
+  // Keep only lines Docker wrote (they carry CONTAINER_NAME).
+  rule {
+    source_labels = ["__journal_container_name"]
+    regex         = ".+"
+    action        = "keep"
+  }
+
+  rule {
+    source_labels = ["__journal_container_name"]
+    target_label  = "container"
+  }
+
+  // Compose names containers <project>-<service>-<n>; the service is the useful label.
+  rule {
+    source_labels = ["__journal_container_name"]
+    regex         = "skipa-[a-z]+-([a-z0-9-]+?)-[0-9]+"
+    target_label  = "service"
+  }
+}
+
+loki.process "containers" {
+  forward_to = [loki.write.local.receiver]
+
+  // Promote the Pino level to a label; everything else stays in the JSON line.
+  stage.json {
+    expressions = { level = "level" }
+  }
+
+  stage.labels {
+    values = { level = "" }
+  }
+}
+
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+  external_labels = { env = "staging" }
+}

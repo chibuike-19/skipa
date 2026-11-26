@@ -1,0 +1,20 @@
+# Provision and deploy a Skipa server (AD §12.5). See infra/ansible/README.md.
+#   ansible-playbook -i inventory/staging.yml site.yml [-e api_image=ghcr.io/<owner>/skipa-api:<sha>]
+- name: Provision a Skipa server
+  hosts: all
+  become: true
+  pre_tasks:
+    - name: Required settings are present
+      ansible.builtin.assert:
+        that:
+          - skipa_env in ['staging', 'production']
+          - api_hostname | length > 0
+          - ssh_allowed_cidrs | length > 0
+          - deploy_authorized_keys | length > 0
+        fail_msg: >-
+          Set ssh_allowed_cidrs and deploy_authorized_keys (group_vars) before provisioning:
+          without them the firewall and SSH hardening would lock everyone out.
+  roles:
+    - base
+    - docker
+    - skipa

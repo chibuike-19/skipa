@@ -1,0 +1,11 @@
+# Encrypted files this server needs from infra/secrets (see its README).
+skipa_encrypted_files:
+  - '{{ skipa_env }}.sops.env'
+  - 'compose-{{ skipa_env }}.sops.env'
+  - 'origin-{{ skipa_env }}.sops.json'
+
+# Compose reads the whole file, so API_IMAGE and RELEASE must be set even when only Postgres is
+# started (before the first deploy has written release.env). Nothing runs with these values.
+skipa_compose_placeholders:
+  API_IMAGE: placeholder/not-used:0
+  RELEASE: not-used

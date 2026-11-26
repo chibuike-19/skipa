@@ -1,0 +1,134 @@
+# Ubuntu 24.04 hardening (AD §12.5): deploy user with keys only, no root or password SSH,
+# ufw (22 from admin addresses, 80/443 from Cloudflare only), fail2ban, unattended security
+# upgrades, UTC clock, persistent journald (container logs live there; Alloy reads them).
+- name: Packages are current
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: safe
+    cache_valid_time: 3600
+
+- name: Base packages are installed
+  ansible.builtin.apt:
+    name:
+      - age
+      - ca-certificates
+      - curl
+      - fail2ban
+      - ufw
+      - unattended-upgrades
+    state: present
+
+- name: Unattended security upgrades are on
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Clock is UTC
+  community.general.timezone:
+    name: Etc/UTC
+
+- name: Journald keeps logs on disk, capped
+  ansible.builtin.copy:
+    dest: /etc/systemd/journald.conf.d/skipa.conf
+    content: |
+      [Journal]
+      Storage=persistent
+      SystemMaxUse=2G
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart journald
+
+- name: Deploy user exists
+  ansible.builtin.user:
+    name: '{{ deploy_user }}'
+    shell: /bin/bash
+    create_home: true
+
+- name: Deploy user has exactly the listed SSH keys
+  ansible.posix.authorized_key:
+    user: '{{ deploy_user }}'
+    key: "{{ deploy_authorized_keys | join('\n') }}"
+    exclusive: true
+
+- name: Deploy user can use sudo (the playbook connects as this user after the first run)
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/90-skipa-deploy
+    content: "{{ deploy_user }} ALL=(ALL) NOPASSWD:ALL\n"
+    owner: root
+    group: root
+    mode: '0440'
+    validate: visudo -cf %s
+
+- name: SSH accepts keys only, no root, deploy user only
+  ansible.builtin.copy:
+    dest: /etc/ssh/sshd_config.d/10-skipa.conf
+    content: |
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      AuthenticationMethods publickey
+      AllowUsers {{ deploy_user }}
+      X11Forwarding no
+      MaxAuthTries 3
+    owner: root
+    group: root
+    mode: '0644'
+    validate: sshd -t -f %s
+  notify: Restart ssh
+
+- name: Fetch Cloudflare's published address ranges
+  ansible.builtin.uri:
+    url: 'https://www.cloudflare.com/{{ item }}'
+    return_content: true
+  loop: [ips-v4, ips-v6]
+  register: base_cloudflare_lists
+  check_mode: false
+
+- name: Keep the ranges for the firewall and Caddy
+  ansible.builtin.set_fact:
+    base_cloudflare_ranges: >-
+      {{ base_cloudflare_lists.results | map(attribute='content') | map('split') | flatten
+         | select | list }}
+
+- name: Cloudflare ranges look right (refuse to touch the firewall otherwise)
+  ansible.builtin.assert:
+    that:
+      - base_cloudflare_ranges | length >= 10
+      - base_cloudflare_ranges | reject('match', '^[0-9a-f:.]+/[0-9]{1,3}$') | list | length == 0
+    fail_msg: Cloudflare's IP list did not download as expected; refusing to change the firewall.
+
+- name: SSH allowed from admin addresses (before the firewall goes on)
+  community.general.ufw:
+    rule: allow
+    port: '22'
+    proto: tcp
+    src: '{{ item }}'
+    comment: ssh admin
+  loop: '{{ ssh_allowed_cidrs }}'
+
+- name: HTTP and HTTPS allowed from Cloudflare only
+  community.general.ufw:
+    rule: allow
+    port: '{{ item[1] }}'
+    proto: tcp
+    src: '{{ item[0] }}'
+    comment: cloudflare
+  loop: "{{ base_cloudflare_ranges | product(['80', '443']) | list }}"
+
+- name: Firewall denies everything else inbound
+  community.general.ufw:
+    state: enabled
+    default: deny
+    direction: incoming
+
+- name: Fail2ban runs (Ubuntu enables the sshd jail by default)
+  ansible.builtin.service:
+    name: fail2ban
+    state: started
+    enabled: true

@@ -1,0 +1,4 @@
+skipa_env: staging
+api_hostname: api.staging.skipa.ng
+# Staging runs on seed data (AD §12.1); db:seed is repeatable and refuses production.
+skipa_seed: true
