@@ -24,6 +24,8 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
+          # pnpm comes from corepack in a later step; the store is cached by hand.
+          package-manager-cache: false
       - name: Activate pnpm from packageManager
         run: corepack enable && pnpm --version
       - name: Locate pnpm store
@@ -50,6 +52,8 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
+          # pnpm comes from corepack in a later step; the store is cached by hand.
+          package-manager-cache: false
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
       - name: Lint PR title as a Conventional Commit
