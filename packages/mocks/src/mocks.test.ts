@@ -10,6 +10,8 @@ import { fixtures } from './seed.ts';
 import { PAYMENT_SETTLE_MS, PENDING_TOO_LONG_MS, resetState } from './state.ts';
 
 const API = 'http://localhost:4000';
+/** Port 9 (discard): nothing answers, so a passed-through request fails. Test-only, never a real host. */
+const UNREACHABLE_API = 'https://127.0.0.1:9';
 const server = createMockServer();
 
 beforeAll(() => {
@@ -273,7 +275,7 @@ describe('unmocked and live operations', () => {
     server.close();
     live.listen({ onUnhandledFrame: 'bypass' });
     try {
-      await expect(fetch('http://127.0.0.1:9/v1/me/stars')).rejects.toThrow();
+      await expect(fetch(`${UNREACHABLE_API}/v1/me/stars`)).rejects.toThrow();
     } finally {
       live.close();
       server.listen({ onUnhandledFrame: 'error' });
