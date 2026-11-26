@@ -14,7 +14,13 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "build": "turbo run build",
-    "commitlint": "commitlint"
+    "commitlint": "commitlint",
+    "local:env": "pnpm --filter @skipa/api local:env",
+    "db:up": "docker compose -f infra/compose/dev.yaml up -d --wait postgres",
+    "db:down": "docker compose -f infra/compose/dev.yaml down",
+    "db:migrate": "pnpm --filter @skipa/api db:migrate",
+    "test:int": "turbo run test:int",
+    "local:setup": "pnpm local:env && pnpm db:up && pnpm db:migrate"
   },
   "devDependencies": {
     "@commitlint/cli": "21.2.4",

@@ -3,5 +3,25 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Fastify HTTP API (src/server.ts) and pg-boss worker (src/worker.ts)."
+  "scripts": {
+    "local:env": "node scripts/local-env.ts",
+    "db:migrate": "node --env-file-if-exists=.env scripts/db-migrate.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run --project unit",
+    "test:int": "vitest run --project int"
+  },
+  "description": "Fastify HTTP API (src/server.ts) and pg-boss worker (src/worker.ts).",
+  "dependencies": {
+    "drizzle-orm": "0.45.4",
+    "pg": "8.23.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "@types/pg": "8.23.1",
+    "drizzle-kit": "0.31.11",
+    "typescript": "7.0.2",
+    "vitest": "5.1.1",
+    "@skipa/config": "workspace:*"
+  }
 }

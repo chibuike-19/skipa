@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitest/config';
 
-import { testDefaults } from './vitest.js';
+import { projectDefaults, rootDefaults } from './vitest.ts';
 
-export default defineConfig({ test: { ...testDefaults } });
+export default defineConfig({ test: { ...rootDefaults, ...projectDefaults } });
