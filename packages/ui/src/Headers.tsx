@@ -145,7 +145,7 @@ export function StoreHeader({
           <img
             src={logoUrl}
             alt={storeName}
-            className="min-w-0 max-w-[180px] shrink object-contain object-left"
+            className="max-w-[160px] shrink-0 object-contain object-left"
             style={{ height: onBack === undefined ? 30 : 26 }}
           />
         ) : (
@@ -177,7 +177,7 @@ export function StoreHeader({
           </button>
         )}
         {branch !== undefined && (
-          <span className="t-micro whitespace-nowrap rounded-pill border border-current px-2 py-[2px] opacity-95">
+          <span className="t-micro min-w-0 truncate rounded-pill border border-current px-2 py-[2px] opacity-95">
             {branch}
           </span>
         )}

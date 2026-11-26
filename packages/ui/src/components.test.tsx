@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Avatar, AVATARS } from './Brand.tsx';
+import { BrandScope } from './BrandScope.tsx';
 import { Button } from './Button.tsx';
 import { Stepper } from './Control.tsx';
 import { OtpField, TextField } from './Field.tsx';
@@ -163,4 +164,44 @@ describe('Avatar', () => {
       );
     },
   );
+});
+
+describe('BrandScope (brief §9)', () => {
+  const adunni = {
+    primary: '#7A1F4A',
+    primaryHover: '#691B40',
+    primaryPressed: '#581635',
+    onPrimary: '#FFFFFF',
+    primaryText: '#7A1F4A',
+    primarySubtle: '#F2E9ED',
+    accent: '#F2B705',
+    onAccent: '#23190F',
+    accentSubtle: '#FEF8E6',
+  };
+
+  it('sets the nine brand slots from BrandTokens on one container', () => {
+    const { container } = render(<BrandScope brand={adunni}>x</BrandScope>);
+    const scope = container.firstElementChild as HTMLElement;
+    expect(scope.dataset.brand).toBe('store');
+    expect(scope.style.getPropertyValue('--color-brand-primary')).toBe('#7A1F4A');
+    expect(scope.style.getPropertyValue('--color-brand-accent-subtle')).toBe('#FEF8E6');
+  });
+
+  it('keeps sheets inside the brand scope (portals would otherwise lose the store colours)', () => {
+    render(
+      <BrandScope brand={adunni}>
+        <Sheet
+          open
+          onOpenChange={vi.fn()}
+          glyph="tag"
+          title="A price changed"
+          body="Check the new total."
+          primary={{ label: 'Pay ₦31,800', onClick: vi.fn() }}
+        />
+      </BrandScope>,
+    );
+    expect(screen.getByRole('dialog').closest('[data-brand]')?.getAttribute('data-brand')).toBe(
+      'store',
+    );
+  });
 });

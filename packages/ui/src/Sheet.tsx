@@ -5,6 +5,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import type { ReactNode } from 'react';
 
 import { Button, type ButtonVariant } from './Button.tsx';
+import { usePortalContainer } from './BrandScope.tsx';
 import { cx } from './cx.ts';
 import { useReturnFocus } from './focus.ts';
 import { Icon, type Glyph } from './Icon.tsx';
@@ -51,9 +52,10 @@ export function Sheet({
   className,
 }: SheetProps) {
   const focus = useReturnFocus();
+  const container = usePortalContainer();
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Portal>
+      <Dialog.Portal container={container}>
         <Dialog.Overlay className="sk-scrim fixed inset-0 z-40 bg-scrim" />
         <Dialog.Content
           {...focus}
