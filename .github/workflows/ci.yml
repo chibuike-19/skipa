@@ -1,6 +1,6 @@
-# CI (AD §12.4). This first version runs install, format, lint, typecheck, unit tests and the
-# PR-title commit check. M0 adds: integration tests on a Postgres 18 service, the contract check,
-# Gitleaks, Semgrep, pnpm audit and Trivy. The frontend agent adds its jobs through PRs.
+# CI (AD §12.4): install, format, lint, typecheck, unit tests, integration tests on Postgres 18.7,
+# and the PR-title commit check. Still to come in M0: the contract check, Gitleaks, Semgrep,
+# pnpm audit and Trivy. The frontend agent adds its jobs through PRs.
 name: ci
 
 on:
@@ -41,6 +41,41 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+
+  integration:
+    # Real Postgres 18.7, every migration applied to an empty database, then the int suite
+    # (append-only, partial unique indexes, RLS isolation, Drizzle schema drift).
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:18.7
+        env:
+          POSTGRES_DB: skipa
+          POSTGRES_USER: skipa_owner
+          POSTGRES_PASSWORD: ci_owner_only
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U skipa_owner -d skipa"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      # Throwaway credentials for the CI service container only; not secrets.
+      APP_ENV: test
+      DATABASE_MIGRATION_URL: postgres://skipa_owner:ci_owner_only@127.0.0.1:5432/skipa
+      DATABASE_URL: postgres://skipa_app:ci_app_only@127.0.0.1:5432/skipa
+      DATABASE_PLATFORM_URL: postgres://skipa_platform:ci_platform_only@127.0.0.1:5432/skipa
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          # pnpm comes from corepack in a later step; the store is cached by hand.
+          package-manager-cache: false
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - name: Migrate an empty database
+        run: pnpm db:migrate
+      - run: pnpm test:int
 
   pr-title:
     # PRs are squash-merged, so the PR title becomes the commit on main (AD §5.3).
