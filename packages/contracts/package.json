@@ -5,16 +5,25 @@
   "type": "module",
   "description": "Zod schemas that generate api/openapi.v1.yaml, the error-code catalogue and the analytics event names.",
   "exports": {
-    "./errors": "./src/errors.ts"
+    "./errors": "./src/errors.ts",
+    "./schemas": "./src/schemas/components.ts",
+    "./primitives": "./src/schemas/primitives.ts",
+    "./operations": "./src/operations/index.ts",
+    "./openapi": "./src/openapi/document.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "contract:build": "node scripts/build-openapi.ts",
+    "contract:check": "node scripts/build-openapi.ts --check"
   },
   "devDependencies": {
     "@skipa/config": "workspace:*",
     "@types/node": "24.19.2",
     "typescript": "7.0.2",
     "vitest": "5.1.1"
+  },
+  "dependencies": {
+    "zod": "4.6.7"
   }
 }
