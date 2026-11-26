@@ -3,5 +3,20 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Pure TypeScript shared by the API and the apps: money (kobo), fees, flagging, random-check blocks, state machines, RBAC, contrast, WAT time."
+  "description": "Pure TypeScript shared by the API and the apps: money (kobo), fees, flagging, random-check blocks, state machines, RBAC, contrast, WAT time.",
+  "exports": {
+    "./money": "./src/money.ts",
+    "./time": "./src/time.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@skipa/config": "workspace:*",
+    "@types/node": "24.19.2",
+    "@vitest/coverage-v8": "5.1.1",
+    "typescript": "7.0.2",
+    "vitest": "5.1.1"
+  }
 }

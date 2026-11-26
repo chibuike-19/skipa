@@ -21,6 +21,19 @@ export const base = defineConfig(
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
+      // Money is integer kobo through packages/domain/money.ts; floats never touch amounts.
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "CallExpression[callee.name='parseFloat'], CallExpression[callee.property.name='parseFloat']",
+          message: 'Use parseNaira() or koboFromDb() from @skipa/domain/money.',
+        },
+        {
+          selector: "CallExpression[callee.property.name='toFixed']",
+          message: 'Use formatNaira() from @skipa/domain/money.',
+        },
+      ],
       eqeqeq: ['error', 'always'],
       'no-console': 'error',
     },
