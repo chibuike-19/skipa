@@ -38,5 +38,10 @@ export const base = defineConfig(
       'no-console': 'error',
     },
   },
+  {
+    // Test doubles often stand in for async handlers without awaiting anything.
+    files: ['**/*.test.ts', '**/test/**/*.ts'],
+    rules: { '@typescript-eslint/require-await': 'off' },
+  },
   prettier,
 );
