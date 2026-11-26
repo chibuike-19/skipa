@@ -1,0 +1,30 @@
+{
+  "name": "@skipa/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Typed client for api/openapi.v1.yaml: generated types, openapi-fetch factory, idempotency and realtime helpers.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/generated/schema.ts"
+  },
+  "scripts": {
+    "api-client:gen": "node scripts/gen.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "NODE_OPTIONS=--experimental-eventsource vitest run"
+  },
+  "dependencies": {
+    "@skipa/contracts": "workspace:*",
+    "openapi-fetch": "0.17.0"
+  },
+  "devDependencies": {
+    "@skipa/config": "workspace:*",
+    "@skipa/mocks": "workspace:*",
+    "@types/node": "24.19.2",
+    "msw": "3.0.7",
+    "openapi-typescript": "7.13.0",
+    "typescript": "7.0.2",
+    "typescript-6": "npm:typescript@6.0.3",
+    "vitest": "5.1.1"
+  }
+}

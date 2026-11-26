@@ -26,7 +26,9 @@
     "db:seed": "pnpm --filter @skipa/api db:seed",
     "tokens:build": "pnpm --filter @skipa/tokens build",
     "lint:css": "stylelint \"packages/ui/**/*.css\" \"apps/**/*.css\" --allow-empty-input",
-    "gallery": "pnpm --filter @skipa/ui gallery"
+    "gallery": "pnpm --filter @skipa/ui gallery",
+    "mocks:validate": "pnpm --filter @skipa/mocks mocks:validate",
+    "api-client:gen": "pnpm --filter @skipa/api-client api-client:gen"
   },
   "devDependencies": {
     "@commitlint/cli": "21.2.4",

@@ -1,0 +1,34 @@
+{
+  "name": "@skipa/mocks",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "MSW handlers, scenarios and fixtures that match api/openapi.v1.yaml (dev and tests only; never shipped).",
+  "exports": {
+    ".": "./src/index.ts",
+    "./browser": "./src/browser.ts",
+    "./node": "./src/node.ts",
+    "./config": "./src/config.ts",
+    "./scenarios": "./src/scenarios.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "NODE_OPTIONS=--experimental-eventsource vitest run",
+    "mocks:validate": "node --experimental-eventsource scripts/validate.ts",
+    "mocks:gen": "node scripts/gen-operations.ts"
+  },
+  "dependencies": {
+    "@skipa/contracts": "workspace:*",
+    "@skipa/domain": "workspace:*",
+    "msw": "3.0.7"
+  },
+  "devDependencies": {
+    "@readme/openapi-parser": "11.0.0",
+    "@skipa/config": "workspace:*",
+    "@types/node": "24.19.2",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "typescript": "7.0.2",
+    "vitest": "5.1.1"
+  }
+}
