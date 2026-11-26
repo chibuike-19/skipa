@@ -46,7 +46,7 @@ function classLiterals(text: string): string[] {
     const classy =
       tokens.every((t) => /^[!-]?[a-z0-9[\]():/._%=,'*>+&-]+$/.test(t)) &&
       tokens.some((t) => /[-:[]/.test(t));
-    if (classy && !NOT_CLASSES.has(literal) && !/^(?:\.\/|@|var\()/.test(literal))
+    if (classy && !NOT_CLASSES.has(literal) && !/^(?:\.\/|@|var\(|--)/.test(literal))
       out.push(...tokens);
   }
   return out;

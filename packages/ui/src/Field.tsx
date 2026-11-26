@@ -1,7 +1,8 @@
 // Field (canvas C-Inputs): label, control, hint or error. Errors are announced (aria-live) and
 // linked with aria-describedby; code inputs use inputmode numeric + autocomplete one-time-code
 // (brief §13). Inputs are 48 px tall with 16 px text (no zoom on iOS). The canvas's `date-range`
-// field arrives with the dashboard filters (F5).
+// field arrives with the dashboard filters (F5). The box shows the focus ring (focus-within), so the
+// inner control drops tokens.css's own ring to avoid a ring inside a ring.
 import {
   forwardRef,
   useEffect,
@@ -144,7 +145,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
           disabled={disabled}
           aria-invalid={error !== undefined}
           aria-describedby={describedBy}
-          className="h-full min-w-0 flex-1 border-0 bg-transparent outline-none disabled:text-disabled"
+          className="h-full min-w-0 flex-1 border-0 bg-transparent outline-none focus-visible:shadow-none disabled:text-disabled"
           {...input}
         />
         {trailingIcon !== undefined && (
@@ -173,7 +174,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
           disabled={disabled}
           aria-invalid={error !== undefined}
           aria-describedby={describedBy}
-          className="block min-h-[88px] w-full resize-none border-0 bg-transparent outline-none"
+          className="block min-h-[88px] w-full resize-none border-0 bg-transparent outline-none focus-visible:shadow-none"
           {...input}
         />
       </div>
@@ -202,7 +203,7 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(funct
           disabled={disabled}
           aria-invalid={error !== undefined}
           aria-describedby={describedBy}
-          className="h-full w-full appearance-none border-0 bg-transparent pr-[44px] pl-4 outline-none"
+          className="h-full w-full appearance-none border-0 bg-transparent pr-[44px] pl-4 outline-none focus-visible:shadow-none"
           {...select}
         >
           {children}

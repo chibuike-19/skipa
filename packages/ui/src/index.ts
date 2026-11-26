@@ -1,4 +1,12 @@
 export {
+  BrandScope,
+  brandStyle,
+  usePortalContainer,
+  type Brand,
+  type BrandColours,
+  type BrandScopeProps,
+} from './BrandScope.tsx';
+export {
   Avatar,
   AVATARS,
   Mark,

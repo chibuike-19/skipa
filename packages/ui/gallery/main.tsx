@@ -10,6 +10,7 @@ import {
   Avatar,
   AVATARS,
   BranchMenu,
+  BrandScope,
   Breadcrumbs,
   Button,
   Checkbox,
@@ -1002,9 +1003,9 @@ function Overlays() {
 function Gallery() {
   return (
     <TooltipProvider>
-      <div
-        data-brand={brand}
-        className="sk flex min-h-screen flex-col gap-5 bg-page p-5 font-ui text-primary"
+      <BrandScope
+        brand={brand}
+        className="flex min-h-screen flex-col gap-5 bg-page p-5 font-ui text-primary"
       >
         <header className="flex flex-wrap items-center gap-4">
           <Wordmark height={40} />
@@ -1043,7 +1044,7 @@ function Gallery() {
           <Tables />
           <BrandArt />
         </main>
-      </div>
+      </BrandScope>
     </TooltipProvider>
   );
 }

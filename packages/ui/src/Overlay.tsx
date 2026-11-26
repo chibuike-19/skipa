@@ -6,6 +6,7 @@ import * as RadixTooltip from '@radix-ui/react-tooltip';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 import { Button } from './Button.tsx';
+import { usePortalContainer } from './BrandScope.tsx';
 import { cx } from './cx.ts';
 import { useReturnFocus } from './focus.ts';
 import { Icon, type Glyph } from './Icon.tsx';
@@ -39,9 +40,10 @@ export function ConfirmDialog({
   className,
 }: ConfirmDialogProps) {
   const focus = useReturnFocus();
+  const container = usePortalContainer();
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Portal>
+      <Dialog.Portal container={container}>
         <Dialog.Overlay className="sk-scrim fixed inset-0 z-40 bg-scrim" />
         <Dialog.Content
           {...focus}
@@ -102,9 +104,10 @@ export function SidePanel({
   className,
 }: SidePanelProps) {
   const focus = useReturnFocus();
+  const container = usePortalContainer();
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Portal>
+      <Dialog.Portal container={container}>
         <Dialog.Overlay className="sk-scrim fixed inset-0 z-40 bg-scrim" />
         <Dialog.Content
           {...focus}
@@ -142,10 +145,11 @@ export function TooltipProvider({ children }: { children: ReactNode }) {
 }
 
 export function Tooltip({ content, children, side = 'top' }: TooltipProps) {
+  const container = usePortalContainer();
   return (
     <RadixTooltip.Root>
       <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
-      <RadixTooltip.Portal>
+      <RadixTooltip.Portal container={container}>
         <RadixTooltip.Content
           side={side}
           sideOffset={6}
