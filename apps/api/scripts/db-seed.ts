@@ -8,14 +8,16 @@ import { PiiCrypto } from '../src/platform/crypto.ts';
 
 const env = dbEnvSchema
   .extend({
-    NODE_ENV: z.string().optional(),
     PII_ENCRYPTION_KEY: z.string(),
     PII_HMAC_KEY: z.string(),
   })
   .parse(process.env);
 
-if (env.APP_ENV === 'production' || env.NODE_ENV === 'production') {
-  process.stderr.write('db:seed refuses to run in production\n');
+// APP_ENV names the environment; NODE_ENV is only the runtime mode, and staging containers run
+// with NODE_ENV=production like production does. config.ts refuses APP_ENV=production without
+// NODE_ENV=production, so production is always APP_ENV=production. Allow-list, not deny-list.
+if (!['local', 'test', 'staging'].includes(env.APP_ENV)) {
+  process.stderr.write(`db:seed refuses to run when APP_ENV is ${env.APP_ENV}\n`);
   process.exit(1);
 }
 

@@ -1,0 +1,8 @@
+# Staging: Hetzner CPX22, Ubuntu 24.04 (AD §12.1). The address comes from the environment so no
+# server address is committed. First run as root (Hetzner's initial key); after that, `deploy`.
+#   SKIPA_HOST=<ip> SKIPA_SSH_USER=root ansible-playbook -i inventory/staging.yml site.yml
+staging:
+  hosts:
+    skipa-staging:
+      ansible_host: "{{ lookup('ansible.builtin.env', 'SKIPA_HOST') }}"
+      ansible_user: "{{ lookup('ansible.builtin.env', 'SKIPA_SSH_USER', default='deploy') }}"

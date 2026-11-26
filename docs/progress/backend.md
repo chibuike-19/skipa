@@ -37,32 +37,54 @@ Updated at the end of every working session: done, next, blocked. Times are WAT.
 
 ### M0 status (26 Nov 2026, second session)
 
-Local branches, stacked, merge in this order: `chore/SKP-0-bootstrap` → `feat/SKP-1-db` →
-`feat/SKP-2-domain-money-time` → `feat/SKP-3-platform`.
+All eight M0 PRs are on GitHub as a stack. Merge in this order; after each squash-merge I
+rebase the next branch onto `main` and retarget it:
 
-- PR 2 (db): done. PR 3 (domain): done.
-- PR 4 (platform): done. Config, logger with redaction, request IDs, error catalogue and
-  envelope, RLS transaction helper, idempotency, Postgres rate limits (migration 0002, ADR-34),
-  SSE hub, CORS/security headers, Sentry, health routes. 22 unit tests plus 40 new integration
-  tests (73 integration in total) pass. The real server was started locally and checked with curl.
-- PR 5 (contracts, `feat/SKP-4-contracts`): done. Zod source for all 177 operations and 148
-  schemas; `contract:build`/`contract:check`; the generated YAML has no semantic differences
-  from the agreed file; all 9 pack fixtures validate against the YAML and against the Zod schemas
-  at runtime; CI contract job with the `contract-change` label rule (ADR-35). The YAML layout
-  changed once with the same meaning: label this PR contract-change (formatting only) for the
-  frontend agent.
-- PR 6 (`ci/SKP-5-security-scans`): done. CI security job: Gitleaks (full history), Semgrep CE,
-  Trivy, pnpm audit, SOPS-encryption guard. All clean locally at the pinned versions. Two
-  reviewed false positives: Gitleaks on fake values in a config test (the test builds
-  them at runtime, so history holds no secret-shaped literal) and one Semgrep CORS rule (`nosemgrep` with reason; covered
-  by integration tests). SOPS layout documented in `infra/secrets/README.md`; encrypted files
-  wait for the lead's age public key.
-- PR 7 (`feat/SKP-6-seed`): done. `pnpm db:seed` (repeatable, refuses production) plus PII
-  crypto (AES-256-GCM, HMAC lookups) that M1 identity will reuse. In CI: migrate + seed on an
-  empty database. See db/README.md for what is seeded and what waits.
-- Next: staging playbook (written and checked locally; not provisioned).
+| Order | PR  | Branch                         | What                                                                     |
+| ----- | --- | ------------------------------ | ------------------------------------------------------------------------ |
+| 1     | #1  | `chore/SKP-0-bootstrap`        | Monorepo, tooling, CI                                                    |
+| 2     | #2  | `feat/SKP-1-db`                | Migration 0000, Drizzle, invariant tests                                 |
+| 3     | #3  | `feat/SKP-2-domain-money-time` | `money.ts`, `time.ts`                                                    |
+| 4     | #4  | `feat/SKP-3-platform`          | Platform plumbing, health routes                                         |
+| 5     | #7  | `feat/SKP-4-contracts`         | Zod contract, `contract:check` (label: contract-change, formatting only) |
+| 6     | #5  | `ci/SKP-5-security-scans`      | Gitleaks, Semgrep, Trivy, audit, SOPS                                    |
+| 7     | #6  | `feat/SKP-6-seed`              | Seed data, PII crypto                                                    |
+| 8     | new | `feat/SKP-7-staging-infra`     | Image, staging stack, Ansible, deploy                                    |
+
+- PRs 1–7: done, CI green on GitHub.
+- PR 8: done except what needs real servers. API image 96 MB compressed; staging compose
+  (Caddy, API, Postgres, GlitchTip 7, Loki, Alloy, Grafana) deployed end to end on local
+  Docker with `deploy.sh` (migrate, seed, health checks through Caddy over TLS); Ansible
+  playbook passes syntax check and ansible-lint; `deploy-staging.yml` builds, scans and pushes
+  the image on every merge and deploys once `STAGING_HOST` is set.
 - Decision: pg-boss is deferred to M1, where the first jobs arrive. `/health/ready` reports the
   queue as `not_installed`.
+
+## 2026-11-26 (third session)
+
+### Done
+
+- Fixed PR #1 CI: `actions/setup-node@v5` turns on its pnpm cache when `package.json` has
+  `packageManager` and calls pnpm before corepack installs it. `package-manager-cache: false`
+  on every setup-node step (we cache the store ourselves).
+- Pushed PRs 2–7 and fixed what CI found on GitHub: `turbo.json` formatting in the db commit;
+  the contract job's Python tools (a venv, since `python3 -I` skips user site-packages); PR
+  title case for commitlint; the PR-title check now re-runs on title edits; GitGuardian and
+  Gitleaks false positives removed at the source (fake keys built at runtime from the first
+  commit, so `.gitleaksignore` is gone; `ggignore` on a compose variable reference); and one
+  real Semgrep finding: AES-GCM now sets `authTagLength` explicitly.
+- PR 8 (staging infra), see table above. Bug found and fixed on the way: `db:seed` refused to
+  run whenever `NODE_ENV=production`, which every deployed container uses, so staging could never
+  be seeded. It now allows `APP_ENV` local, test or staging only (config already refuses
+  `APP_ENV=production` without `NODE_ENV=production`). AD §7.5 says "refuses when
+  `NODE_ENV=production`"; the intent (never in production) is unchanged.
+- Docker's published ports skip ufw, so Caddy runs on the host network and the API listens on
+  127.0.0.1 only; ufw then really limits 80/443 to Cloudflare.
+
+### Next
+
+- M1 (identity, tenancy, catalogue, check-in) once the M0 stack is merged.
+- Staging provisioning as soon as access arrives (see Blocked).
 
 ### Questions for the lead (default if no answer by 30 Nov 2026)
 
@@ -93,10 +115,19 @@ Local branches, stacked, merge in this order: `chore/SKP-0-bootstrap` → `feat/
   review from Code Owners" stays off until they're replaced.
 - **SOPS recipients:** question: what are the age public keys (lead, staging server, production
   server)? Default: the layout and guard are in place; no encrypted files until the keys arrive.
-- **Staging provisioning** needs Hetzner access, the domain, the lead's age public key and
-  Cloudflare access. Default (agreed): write and check the playbook locally; M0 reports staging as
-  not provisioned.
+- **Staging provisioning** needs: a Hetzner CPX22 (Ubuntu 24.04) with your root SSH key; DNS for
+  `api.staging.skipa.ng` on Cloudflare with a Cloudflare origin certificate; your age public key;
+  your SSH admin addresses and public key. Steps: `infra/ansible/README.md`. Default (agreed):
+  M0 reports staging as not provisioned.
+- **How CI reaches SSH for deploys.** The AD allows port 22 from admin addresses only, but GitHub
+  runners have no fixed addresses. Options: (a) Hetzner Cloud Firewall API in the workflow opens
+  22 to the runner's address for the deploy and closes it after (no new vendor; needs an
+  `HCLOUD_TOKEN` secret); (b) Tailscale (new vendor); (c) 22 open to all with keys only and
+  fail2ban (weakens §12). Default if unanswered by 30 Nov 2026: (a); the deploy job stays off
+  until `STAGING_HOST` is set, so nothing is exposed meanwhile.
 
 ### Contract
 
-- No change. `api/openapi.v1.yaml` is the agreed file, byte-for-byte.
+- PR #7 (`contract-change`, formatting only): `api/openapi.v1.yaml` is now generated from
+  `packages/contracts`; same meaning as the agreed file (checked by `scripts/contract_diff.py`),
+  different layout. The frontend agent should confirm their client generation still works.

@@ -1,0 +1,55 @@
+# Docker Engine and the Compose plugin from Docker's own apt repository (AD §12.5).
+- name: Docker's apt key is present
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Docker's apt repository is configured
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [arch={{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64' }}
+      signed-by=/etc/apt/keyrings/docker.asc]
+      https://download.docker.com/linux/ubuntu {{ ansible_facts['distribution_release'] }} stable
+    filename: docker
+    state: present
+
+- name: Docker Engine and Compose are installed
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+    state: present
+    update_cache: true
+
+- name: Docker daemon settings
+  ansible.builtin.copy:
+    dest: /etc/docker/daemon.json
+    # journald: container logs go to the journal (Alloy → Loki). live-restore: containers keep
+    # running while the daemon restarts for an upgrade.
+    content: |
+      {
+        "log-driver": "journald",
+        "live-restore": true,
+        "no-new-privileges": true
+      }
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart docker
+
+- name: Docker runs at boot
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Deploy user can run docker
+  ansible.builtin.user:
+    name: '{{ deploy_user }}'
+    groups: docker
+    append: true

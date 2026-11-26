@@ -1,0 +1,57 @@
+# Public entry point (AD §11.2, §12.2). Cloudflare proxies the hostname (Full-strict TLS); Caddy
+# serves the Cloudflare origin certificate from /etc/caddy/tls, which infra/ansible writes from SOPS.
+#
+# Client IPs: requests arrive from Cloudflare, so Caddy trusts only Cloudflare's ranges
+# (CLOUDFLARE_IP_RANGES, fetched by infra/ansible) and takes the client from CF-Connecting-IP.
+# It then sends exactly that IP to the API in X-Forwarded-For; the API trusts only private
+# addresses as proxies (app.ts trustProxy), so rate limits see the shopper, not Cloudflare.
+#
+# Request IDs: the API creates a UUID v7 when X-Request-Id is missing (platform/ids.ts); Caddy
+# passes a client's own value through unchanged.
+
+{
+	admin off
+	servers {
+		trusted_proxies static {$CLOUDFLARE_IP_RANGES}
+		client_ip_headers CF-Connecting-IP
+		trusted_proxies_strict
+	}
+	log {
+		output stdout
+		format json
+	}
+}
+
+{$API_HOSTNAME} {
+	tls /etc/caddy/tls/origin.pem /etc/caddy/tls/origin.key
+
+	encode zstd gzip
+
+	request_body {
+		max_size 10MB
+	}
+
+	# Internal endpoints (AD §10.5) are reached on the private network only.
+	@internal path /internal/*
+	respond @internal 404
+
+	reverse_proxy {$API_UPSTREAM} {
+		header_up X-Forwarded-For {client_ip}
+		header_up -X-Real-IP
+		health_uri /health/live
+		health_interval 10s
+		health_timeout 3s
+	}
+
+	header {
+		-Server
+	}
+
+	log
+}
+
+# Plain-HTTP requests for any other host (direct-to-IP scans) get nothing. On 443 an unknown name
+# has no certificate, so the TLS handshake fails before any request is read.
+http:// {
+	abort
+}

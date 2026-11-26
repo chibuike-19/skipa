@@ -1,0 +1,20 @@
+# Settings shared by every Skipa server.
+skipa_root: /srv/skipa
+skipa_secrets_dir: /etc/skipa
+deploy_user: deploy
+
+# sops decrypts with the server's own age key (/etc/skipa/age.key); the age package only provides
+# age-keygen to create that key. Versions as in infra/secrets/README.md.
+sops_version: 3.13.3
+
+# Who may SSH in (port 22). Open question for the lead (docs/progress/backend.md): the admin
+# addresses, and how CI reaches the server for deploys.
+ssh_allowed_cidrs: []
+
+# Public SSH keys for the deploy user (the lead, and the CI deploy key).
+deploy_authorized_keys: []
+
+# Optional: deploy this image at the end of the run (first install), e.g.
+#   -e api_image=ghcr.io/<owner>/skipa-api:<git-sha>
+# A private GHCR image also needs GHCR_USER and GHCR_TOKEN (read:packages) in the environment.
+api_image: ''
