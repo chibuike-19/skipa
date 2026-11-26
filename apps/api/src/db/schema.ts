@@ -3633,3 +3633,16 @@ export const events = analytics.table(
     check('events_source_check', sql`source = ANY (ARRAY['client'::text, 'server'::text])`),
   ],
 );
+
+// db/migrations/0002_rate_limit_counters.sql (UNLOGGED; see ADR-34).
+export const rateLimitCounters = pgTable(
+  'rate_limit_counters',
+  {
+    key: text().primaryKey().notNull(),
+    count: integer().notNull(),
+    resetAt: timestamp('reset_at', { withTimezone: true, mode: 'date' }).notNull(),
+  },
+  (table) => [
+    index('rate_limit_counters_reset_idx').using('btree', table.resetAt.asc().nullsLast()),
+  ],
+);

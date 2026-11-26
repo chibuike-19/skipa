@@ -3,5 +3,18 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Zod schemas that generate api/openapi.v1.yaml, the error-code catalogue and the analytics event names."
+  "description": "Zod schemas that generate api/openapi.v1.yaml, the error-code catalogue and the analytics event names.",
+  "exports": {
+    "./errors": "./src/errors.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@skipa/config": "workspace:*",
+    "@types/node": "24.19.2",
+    "typescript": "7.0.2",
+    "vitest": "5.1.1"
+  }
 }
