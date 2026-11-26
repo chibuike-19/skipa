@@ -1,0 +1,39 @@
+-- Database roles on a server (brief §7; db/migrations/0001_roles_grants.sql). Rendered by
+-- infra/ansible with passwords read from the decrypted env files, piped to psql as the Postgres
+-- superuser over stdin (never on a command line), and safe to run again.
+--   skipa_owner     owns the skipa database; runs migrations; cannot create roles or databases
+--   skipa_app       request traffic; RLS enforced
+--   skipa_platform  worker and super admin routes; BYPASSRLS
+--   glitchtip       owns the separate glitchtip database
+\set ON_ERROR_STOP on
+
+DO $roles$
+DECLARE
+  r record;
+BEGIN
+  FOR r IN
+    SELECT * FROM (VALUES
+      ('skipa_owner',    '{{ owner_password | replace("'", "''") }}',     false),
+      ('skipa_app',      '{{ app_password | replace("'", "''") }}',       false),
+      ('skipa_platform', '{{ platform_password | replace("'", "''") }}',  true),
+      ('glitchtip',      '{{ glitchtip_password | replace("'", "''") }}', false)
+    ) AS t(name, password, bypass_rls)
+  LOOP
+    EXECUTE format(
+      '%s ROLE %I LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION %s PASSWORD %L',
+      CASE WHEN EXISTS (SELECT 1 FROM pg_roles WHERE rolname = r.name) THEN 'ALTER' ELSE 'CREATE' END,
+      r.name,
+      CASE WHEN r.bypass_rls THEN 'BYPASSRLS' ELSE 'NOBYPASSRLS' END,
+      r.password
+    );
+  END LOOP;
+END
+$roles$;
+
+ALTER DATABASE skipa OWNER TO skipa_owner;
+REVOKE ALL ON DATABASE skipa FROM PUBLIC;
+GRANT CONNECT ON DATABASE skipa TO skipa_app, skipa_platform;
+
+SELECT 'CREATE DATABASE glitchtip OWNER glitchtip'
+WHERE NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = 'glitchtip') \gexec
+REVOKE ALL ON DATABASE glitchtip FROM PUBLIC;

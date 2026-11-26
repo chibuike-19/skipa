@@ -1,0 +1,90 @@
+# Staging deploy (AD §12.4): every merge to main builds the API image, scans it, pushes it to GHCR
+# and, once the staging server exists, deploys it with infra/compose/deploy.sh over SSH.
+#
+# The deploy job runs only when the repository variable STAGING_HOST is set. It also needs:
+#   secrets.STAGING_SSH_KEY      private key whose public half is in deploy_authorized_keys
+#   secrets.STAGING_KNOWN_HOSTS  the server's host key line (ssh-keyscan once, check it by hand)
+# Static app deploys to Cloudflare and the Paystack sandbox suite join this workflow later.
+name: deploy-staging
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+jobs:
+  image:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.name.outputs.image }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Image name
+        id: name
+        run: |
+          owner="$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
+          echo "image=ghcr.io/$owner/skipa-api:$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+      - name: Build
+        env:
+          IMAGE: ${{ steps.name.outputs.image }}
+        run: >-
+          docker build -f apps/api/Dockerfile -t "$IMAGE"
+          --label "org.opencontainers.image.source=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY"
+          --label "org.opencontainers.image.revision=$GITHUB_SHA" .
+      - name: Trivy (image, high and critical)
+        env:
+          IMAGE: ${{ steps.name.outputs.image }}
+        run: >-
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock:ro aquasec/trivy:0.76.2
+          image --quiet --scanners vuln,secret --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1
+          "$IMAGE"
+      - name: Push
+        env:
+          IMAGE: ${{ steps.name.outputs.image }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          printf '%s' "$TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          docker push "$IMAGE"
+          docker logout ghcr.io
+
+  deploy:
+    needs: image
+    if: vars.STAGING_HOST != ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: staging
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: SSH key and pinned host key
+        env:
+          SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.STAGING_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy && chmod 600 ~/.ssh/id_deploy
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Deploy
+        env:
+          HOST: ${{ vars.STAGING_HOST }}
+          IMAGE: ${{ needs.image.outputs.image }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # The job token (read:packages, valid only while this job runs) lets the server pull the
+        # private image; it is passed on stdin and the login is removed afterwards.
+        run: |
+          ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes "deploy@$HOST" \
+            "docker login ghcr.io -u '$GITHUB_ACTOR' --password-stdin" <<< "$TOKEN"
+          ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes "deploy@$HOST" \
+            "/srv/skipa/compose/deploy.sh '$IMAGE' --seed; status=\$?; docker logout ghcr.io; exit \$status"

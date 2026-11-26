@@ -1,0 +1,210 @@
+# Install the stack, decrypt secrets on the server, create the database roles, deploy (AD §11.2,
+# §12.3–12.5). Secrets: infra/secrets/<file>.sops.* are copied encrypted and decrypted here with
+# the server's own age key; plain values never pass through the machine running Ansible's logs.
+- name: Folders exist
+  ansible.builtin.file:
+    path: '{{ item.path }}'
+    state: directory
+    owner: '{{ item.owner | default("root") }}'
+    group: '{{ item.group | default("root") }}'
+    mode: '{{ item.mode }}'
+  loop:
+    - { path: '{{ skipa_root }}', mode: '0755' }
+    - path: '{{ skipa_root }}/compose'
+      owner: '{{ deploy_user }}'
+      group: '{{ deploy_user }}'
+      mode: '0750'
+    - { path: '{{ skipa_root }}/encrypted', mode: '0700' }
+    - { path: '{{ skipa_secrets_dir }}', group: '{{ deploy_user }}', mode: '0750' }
+    - { path: '{{ skipa_secrets_dir }}/tls', group: '{{ deploy_user }}', mode: '0750' }
+
+- name: Stack files are installed
+  ansible.builtin.copy:
+    src: '{{ playbook_dir }}/../{{ item.src }}'
+    dest: '{{ skipa_root }}/{{ item.dest }}'
+    owner: root
+    group: root
+    mode: '{{ item.mode | default("0644") }}'
+    directory_mode: '0755'
+  loop:
+    - { src: 'compose/{{ skipa_env }}.yaml', dest: 'compose/{{ skipa_env }}.yaml' }
+    - { src: compose/deploy.sh, dest: compose/deploy.sh, mode: '0755' }
+    - { src: caddy/, dest: caddy/ }
+    - { src: loki/, dest: loki/ }
+    - { src: alloy/, dest: alloy/ }
+    - { src: grafana/, dest: grafana/ }
+
+- name: Host settings for compose (hostname, Cloudflare ranges for Caddy)
+  ansible.builtin.copy:
+    dest: '{{ skipa_root }}/compose/host.env'
+    content: |
+      API_HOSTNAME={{ api_hostname }}
+      CLOUDFLARE_IP_RANGES={{ base_cloudflare_ranges | join(' ') }}
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_user }}'
+    mode: '0640'
+
+- name: Sops is installed (checksum from the release's checksum file)
+  ansible.builtin.get_url:
+    url: >-
+      https://github.com/getsops/sops/releases/download/v{{ sops_version }}/sops-v{{ sops_version }}.linux.{{ sops_arch }}
+    dest: /usr/local/bin/sops
+    checksum: >-
+      sha256:https://github.com/getsops/sops/releases/download/v{{ sops_version }}/sops-v{{ sops_version }}.checksums.txt
+    owner: root
+    group: root
+    mode: '0755'
+  vars:
+    sops_arch: "{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64' }}"
+
+- name: The server has its own age key
+  ansible.builtin.command:
+    cmd: age-keygen -o {{ skipa_secrets_dir }}/age.key
+    creates: '{{ skipa_secrets_dir }}/age.key'
+
+- name: The age key is readable by root only
+  ansible.builtin.file:
+    path: '{{ skipa_secrets_dir }}/age.key'
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Read the server's age public key
+  ansible.builtin.command:
+    cmd: age-keygen -y {{ skipa_secrets_dir }}/age.key
+  register: skipa_age_public_key
+  changed_when: false
+
+- name: Which encrypted files exist in the repository
+  ansible.builtin.stat:
+    path: '{{ playbook_dir }}/../secrets/{{ item }}'
+  loop: '{{ skipa_encrypted_files }}'
+  register: skipa_encrypted_found
+  delegate_to: localhost
+  become: false
+
+- name: Stop here until the secrets are encrypted for this server
+  when: skipa_encrypted_found.results | rejectattr('stat.exists') | list | length > 0
+  block:
+    - name: Explain what is missing
+      ansible.builtin.debug:
+        msg:
+          - "Missing in infra/secrets: {{ skipa_encrypted_found.results | rejectattr('stat.exists') | map(attribute='item') | join(', ') }}"
+          - 'Add this server as a recipient in .sops.yaml, encrypt the files (infra/secrets/README.md), then run again.'
+          - 'Server age public key: {{ skipa_age_public_key.stdout }}'
+    - name: End the run for this host (base hardening and Docker are done)
+      ansible.builtin.meta: end_host
+
+- name: Encrypted files are on the server
+  ansible.builtin.copy:
+    src: '{{ playbook_dir }}/../secrets/{{ item }}'
+    dest: '{{ skipa_root }}/encrypted/{{ item }}'
+    owner: root
+    group: root
+    mode: '0600'
+  loop: '{{ skipa_encrypted_files }}'
+
+- name: Decrypt the env files
+  ansible.builtin.command:
+    cmd: sops --decrypt --input-type dotenv --output-type dotenv {{ skipa_root }}/encrypted/{{ item.src }}
+  environment:
+    SOPS_AGE_KEY_FILE: '{{ skipa_secrets_dir }}/age.key'
+  loop:
+    - { src: '{{ skipa_env }}.sops.env', dest: '{{ skipa_env }}.env' }
+    - { src: 'compose-{{ skipa_env }}.sops.env', dest: 'compose-{{ skipa_env }}.env' }
+  register: skipa_decrypted_env
+  changed_when: false
+  no_log: true
+
+- name: Write the env files (root-owned, readable by the deploy user for docker compose)
+  ansible.builtin.copy:
+    dest: '{{ skipa_secrets_dir }}/{{ item.item.dest }}'
+    content: "{{ item.stdout }}\n"
+    owner: root
+    group: '{{ deploy_user }}'
+    mode: '0640'
+  loop: '{{ skipa_decrypted_env.results }}'
+  no_log: true
+
+- name: Decrypt the Cloudflare origin certificate
+  ansible.builtin.command:
+    cmd: sops --decrypt --output-type json {{ skipa_root }}/encrypted/origin-{{ skipa_env }}.sops.json
+  environment:
+    SOPS_AGE_KEY_FILE: '{{ skipa_secrets_dir }}/age.key'
+  register: skipa_decrypted_origin
+  changed_when: false
+  no_log: true
+
+- name: Write the origin certificate and key for Caddy
+  ansible.builtin.copy:
+    dest: '{{ skipa_secrets_dir }}/tls/{{ item.file }}'
+    content: '{{ (skipa_decrypted_origin.stdout | from_json)[item.field] }}'
+    owner: root
+    group: '{{ deploy_user }}'
+    mode: '{{ item.mode }}'
+  loop:
+    - { file: origin.pem, field: cert, mode: '0644' }
+    - { file: origin.key, field: key, mode: '0640' }
+  no_log: true
+
+- name: Pick the database passwords out of the decrypted files
+  ansible.builtin.set_fact:
+    skipa_db_passwords:
+      owner_password: "{{ api_env | regex_search('(?m)^DATABASE_MIGRATION_URL=(.+)$', '\\1') | first | urlsplit('password') | urldecode }}"
+      app_password: "{{ api_env | regex_search('(?m)^DATABASE_URL=(.+)$', '\\1') | first | urlsplit('password') | urldecode }}"
+      platform_password: "{{ api_env | regex_search('(?m)^DATABASE_PLATFORM_URL=(.+)$', '\\1') | first | urlsplit('password') | urldecode }}"
+      glitchtip_password: "{{ compose_env | regex_search('(?m)^GLITCHTIP_DB_PASSWORD=(.+)$', '\\1') | first }}"
+  vars:
+    api_env: '{{ skipa_decrypted_env.results[0].stdout }}'
+    compose_env: '{{ skipa_decrypted_env.results[1].stdout }}'
+  no_log: true
+
+- name: Postgres is running
+  ansible.builtin.command:
+    cmd: >-
+      docker compose -f {{ skipa_env }}.yaml --env-file {{ skipa_secrets_dir }}/compose-{{ skipa_env }}.env
+      --env-file host.env up -d --wait postgres
+    chdir: '{{ skipa_root }}/compose'
+  environment: '{{ skipa_compose_placeholders }}'
+  become: true
+  become_user: '{{ deploy_user }}'
+  changed_when: false
+
+- name: Database roles and the GlitchTip database exist (SQL on stdin, never on a command line)
+  ansible.builtin.command:
+    cmd: >-
+      docker compose -f {{ skipa_env }}.yaml --env-file {{ skipa_secrets_dir }}/compose-{{ skipa_env }}.env
+      --env-file host.env exec -T postgres psql -U postgres -d postgres -q
+    chdir: '{{ skipa_root }}/compose'
+    stdin: "{{ lookup('ansible.builtin.template', 'db-roles.sql.j2', template_vars=skipa_db_passwords) }}"
+  environment: '{{ skipa_compose_placeholders }}'
+  become: true
+  become_user: '{{ deploy_user }}'
+  changed_when: false
+  no_log: true
+
+- name: Log in to GHCR for a private image
+  ansible.builtin.command:
+    cmd: docker login ghcr.io --username {{ lookup('ansible.builtin.env', 'GHCR_USER') }} --password-stdin
+    stdin: "{{ lookup('ansible.builtin.env', 'GHCR_TOKEN') }}"
+  become: true
+  become_user: '{{ deploy_user }}'
+  when: api_image | length > 0 and lookup('ansible.builtin.env', 'GHCR_TOKEN') | length > 0
+  changed_when: false
+  no_log: true
+
+- name: Deploy the requested image
+  ansible.builtin.command:
+    cmd: "{{ skipa_root }}/compose/deploy.sh {{ api_image }}{{ ' --seed' if skipa_seed | default(false) else '' }}"
+  environment:
+    SKIPA_ENV: '{{ skipa_env }}'
+  become: true
+  become_user: '{{ deploy_user }}'
+  when: api_image | length > 0
+  changed_when: true
+
+- name: Done
+  ansible.builtin.debug:
+    msg:
+      - 'Server age public key: {{ skipa_age_public_key.stdout }}'
+      - "{{ 'Deployed ' ~ api_image if api_image | length > 0 else 'No image deployed; pass -e api_image=... or merge to main.' }}"

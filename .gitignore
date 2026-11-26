@@ -19,3 +19,6 @@ keys.txt
 /tmp/
 *.log
 .local/
+
+# Ansible collections installed locally from infra/ansible/requirements.yml
+infra/ansible/.collections/
