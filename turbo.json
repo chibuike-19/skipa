@@ -11,6 +11,17 @@
     "test": {
       "dependsOn": ["^build"],
       "outputs": []
+    },
+    "test:int": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "cache": false,
+      "passThroughEnv": [
+        "APP_ENV",
+        "DATABASE_URL",
+        "DATABASE_PLATFORM_URL",
+        "DATABASE_MIGRATION_URL"
+      ]
     }
   }
 }

@@ -7,7 +7,7 @@
   "exports": {
     "./eslint": "./eslint.js",
     "./commitlint": "./commitlint.js",
-    "./vitest": "./vitest.js",
+    "./vitest": "./vitest.ts",
     "./tsconfig.base.json": "./tsconfig.base.json",
     "./tsconfig.node.json": "./tsconfig.node.json"
   },

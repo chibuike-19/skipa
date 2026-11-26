@@ -18,3 +18,4 @@ keys.txt
 # Local data
 /tmp/
 *.log
+.local/

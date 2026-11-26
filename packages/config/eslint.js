@@ -20,6 +20,7 @@ export const base = defineConfig(
     rules: {
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
       eqeqeq: ['error', 'always'],
       'no-console': 'error',
     },
