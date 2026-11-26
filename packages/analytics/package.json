@@ -1,0 +1,24 @@
+{
+  "name": "@skipa/analytics",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Client observability: personal-data scrubbing and GlitchTip (Sentry SDK) setup through the API tunnel. track() and the outbox arrive with contracts/events.ts (backend M1).",
+  "exports": {
+    "./scrub": "./src/scrub.ts",
+    "./monitoring": "./src/monitoring.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@sentry/react": "11.17.0"
+  },
+  "devDependencies": {
+    "@skipa/config": "workspace:*",
+    "@types/node": "24.19.2",
+    "typescript": "7.0.2",
+    "vitest": "5.1.1"
+  }
+}
