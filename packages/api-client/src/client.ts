@@ -16,6 +16,8 @@ export interface ApiClientOptions {
   version: string;
   /** Called for every failed call, before it is thrown: Sentry breadcrumbs, session expiry. */
   onError?: (error: ApiError, request: { method: string; path: string; requestId: string }) => void;
+  /** Extra headers per request, e.g. the shopper's `X-Skipa-Device` token (contract: Device). */
+  headers?: () => Record<string, string>;
   /** For tests. Defaults to the global fetch at call time (so MSW can intercept it). */
   fetch?: (request: Request) => Promise<Response>;
 }
@@ -35,6 +37,7 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
       request.headers.set('X-Skipa-Client', `${options.app}/${options.version}`);
       if (!request.headers.has('X-Request-Id'))
         request.headers.set('X-Request-Id', crypto.randomUUID());
+      for (const [name, value] of Object.entries(options.headers?.() ?? {})) request.headers.set(name, value);
       lastRequestIds.set(request, request.headers.get('X-Request-Id') ?? '');
       return request;
     },
