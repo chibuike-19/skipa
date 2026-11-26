@@ -1,0 +1,28 @@
+{
+  "name": "@skipa/config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared ESLint, TypeScript, Vitest and commitlint presets for the Skipa monorepo.",
+  "exports": {
+    "./eslint": "./eslint.js",
+    "./commitlint": "./commitlint.js",
+    "./vitest": "./vitest.js",
+    "./tsconfig.base.json": "./tsconfig.base.json",
+    "./tsconfig.node.json": "./tsconfig.node.json"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@commitlint/load": "21.2.4",
+    "@commitlint/lint": "21.2.4",
+    "@types/node": "24.19.2",
+    "typescript": "7.0.2",
+    "vitest": "5.1.1"
+  },
+  "dependencies": {
+    "@commitlint/types": "21.2.3"
+  }
+}

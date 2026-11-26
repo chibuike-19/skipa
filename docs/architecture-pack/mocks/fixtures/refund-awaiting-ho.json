@@ -1,0 +1,19 @@
+{
+  "schema": "Refund",
+  "data": {
+    "id": "0193a1f2-9999-7000-8000-000000000001",
+    "orderId": "0193a1f2-4444-7000-8000-000000000002",
+    "receiptNumber": "LK-04790",
+    "amountKobo": 2480000,
+    "status": "awaiting_head_office",
+    "reason": "wrong_price",
+    "note": "Rice rang up at the wrong price",
+    "createdAt": "2026-11-25T10:12:00Z",
+    "needsHeadOffice": true,
+    "declineReason": null,
+    "paymentMethod": null,
+    "paidAt": null,
+    "recordedByName": null,
+    "ticketId": "0193a1f2-aaaa-7000-8000-000000000001"
+  }
+}

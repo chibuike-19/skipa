@@ -1,0 +1,28 @@
+{
+  "schema": "Order",
+  "data": {
+    "id": "0193a1f2-4444-7000-8000-000000000001",
+    "orderNumber": "SKP-LK-04815",
+    "status": "pending",
+    "branchId": "0193a1f2-0000-7000-8000-0000000000a1",
+    "items": [
+      {
+        "id": "0193a1f2-5555-7000-8000-000000000001",
+        "name": "Malt drink 33 cl",
+        "barcode": "6156000231187",
+        "quantity": 2,
+        "unitPriceKobo": 40000,
+        "lineTotalKobo": 80000,
+        "categoryName": "Drinks"
+      }
+    ],
+    "itemCount": 2,
+    "totalKobo": 80000,
+    "createdAt": "2026-11-25T13:35:02Z",
+    "paidAt": null,
+    "exitValidUntil": null,
+    "receiptId": null,
+    "pendingSince": "2026-11-25T13:35:06Z",
+    "pendingTooLong": false
+  }
+}

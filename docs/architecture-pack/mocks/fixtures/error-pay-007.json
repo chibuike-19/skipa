@@ -1,0 +1,11 @@
+{
+  "schema": "Error",
+  "data": {
+    "error": {
+      "code": "PAY-007",
+      "message": "verification pending > 120 s for SKP-LK-04815-A1",
+      "userMessage": "We couldn't confirm your payment yet. Don't pay again; we're still checking.",
+      "requestId": "91c0-44ad"
+    }
+  }
+}

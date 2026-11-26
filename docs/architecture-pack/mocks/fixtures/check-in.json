@@ -1,0 +1,67 @@
+{
+  "schema": "ShoppingSession",
+  "data": {
+    "sessionId": "0193a1f2-1111-7000-8000-000000000001",
+    "branch": {
+      "branchId": "0193a1f2-0000-7000-8000-0000000000a1",
+      "organisationId": "0193a1f2-0000-7000-8000-00000000000a",
+      "storeName": "Adunni Mart",
+      "branchName": "Lekki Phase 1",
+      "area": "Lekki",
+      "address": "14 Admiralty Way, Lekki Phase 1, Lagos",
+      "latitude": 6.4474,
+      "longitude": 3.4723,
+      "openingHours": {
+        "mon": [
+          [
+            "08:00",
+            "21:00"
+          ]
+        ],
+        "sun": [
+          [
+            "12:00",
+            "20:00"
+          ]
+        ]
+      },
+      "skipaStatus": "on",
+      "brand": {
+        "displayName": "Adunni Mart",
+        "logoSquareUrl": "https://assets.skipa.ng/o/adunni/logo-sq.3f9a.webp",
+        "logoWideUrl": "https://assets.skipa.ng/o/adunni/logo-wide.8c21.webp",
+        "coverUrl": "https://assets.skipa.ng/o/adunni/cover.1b7e.webp",
+        "primary": "#7A1F4A",
+        "primaryHover": "#691B40",
+        "primaryPressed": "#581635",
+        "onPrimary": "#FFFFFF",
+        "primaryText": "#7A1F4A",
+        "primarySubtle": "#F2E9ED",
+        "accent": "#F2B705",
+        "onAccent": "#23190F",
+        "accentSubtle": "#FEF8E6",
+        "welcomeMessage": "Skip the queue at Adunni Mart Lekki. Scan, pay and walk out.",
+        "receiptHeader": "Adunni Mart · Lekki Phase 1",
+        "receiptFooter": "Thank you for shopping with us. Returns at the service desk within 7 days.",
+        "socialLinks": {
+          "instagram": "https://instagram.com/adunnimart"
+        }
+      },
+      "serviceDesk": "Customer service desk by the main entrance",
+      "phone": "+234 803 000 1180"
+    },
+    "status": "active",
+    "catalogueVersion": 4821,
+    "limits": {
+      "maxValueKobo": 15000000,
+      "maxItems": 30
+    },
+    "paymentChannels": [
+      "card",
+      "bank_transfer",
+      "ussd"
+    ],
+    "exitWindowMinutes": 30,
+    "sessionTimeoutMinutes": 60
+  }
+}

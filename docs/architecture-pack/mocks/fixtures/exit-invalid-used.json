@@ -1,0 +1,19 @@
+{
+  "schema": "ExitDecision",
+  "data": {
+    "checkId": "0193a1f2-8888-7000-8000-000000000002",
+    "decision": "invalid",
+    "invalidReason": "already_used",
+    "usedAt": "2026-11-25T13:39:00Z",
+    "randomCheck": false,
+    "largeBasket": false,
+    "expectedWeightGrams": null,
+    "weightRangeGrams": null,
+    "receipt": {
+      "receiptNumber": "LK-04822",
+      "paidAt": "2026-11-25T13:35:41Z",
+      "itemCount": 2
+    },
+    "items": []
+  }
+}

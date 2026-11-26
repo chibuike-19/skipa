@@ -1,0 +1,20 @@
+node_modules/
+dist/
+coverage/
+.turbo/
+*.tsbuildinfo
+.DS_Store
+
+# Secrets: only SOPS-encrypted files (*.sops.*) and *.env.example are committed.
+.env
+.env.*
+!.env.example
+!*.env.example
+*.key
+*.pem
+age.txt
+keys.txt
+
+# Local data
+/tmp/
+*.log
