@@ -1,0 +1,7 @@
+{
+  "name": "@skipa/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Fastify HTTP API (src/server.ts) and pg-boss worker (src/worker.ts)."
+}

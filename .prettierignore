@@ -1,0 +1,7 @@
+pnpm-lock.yaml
+# Agreed source files from the architecture pack are kept byte-for-byte.
+docs/SKIPA_SYSTEM_ARCHITECTURE.md
+docs/briefs/
+docs/architecture-pack/
+api/openapi.v1.yaml
+db/schema.sql

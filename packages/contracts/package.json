@@ -1,0 +1,7 @@
+{
+  "name": "@skipa/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Zod schemas that generate api/openapi.v1.yaml, the error-code catalogue and the analytics event names."
+}

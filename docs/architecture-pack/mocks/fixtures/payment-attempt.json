@@ -1,0 +1,11 @@
+{
+  "schema": "PaymentAttempt",
+  "data": {
+    "attemptId": "0193a1f2-6666-7000-8000-000000000001",
+    "reference": "SKP-LK-04815-A1",
+    "accessCode": "0peioxfhpn",
+    "authorizationUrl": "https://checkout.paystack.com/0peioxfhpn",
+    "publicKey": "pk_test_xxxxxxxxxxxxxxxx",
+    "amountKobo": 80000
+  }
+}

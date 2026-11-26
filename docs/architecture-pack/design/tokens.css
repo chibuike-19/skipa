@@ -1,0 +1,158 @@
+/* Skipa design tokens v1.1 — Stage 7 review. Semantic names only. Brand slots change per store; status, exit and skipa/* never do. */
+:root{
+  /* ---------- primitives ---------- */
+  --indigo-950:#19254D; --indigo-900:#1E2C5C; --indigo-700:#23336B; --indigo-200:#D3D6E1; --indigo-100:#E9EBF0;
+  --ochre-700:#A77511; --ochre-600:#C88C14; --ochre-500:#E8A317; --ochre-100:#FCEBC4; --ochre-50:#FDF6E8;
+  --laterite-600:#B4472A;
+  --paper:#FBF5EA; --white:#FFFFFF;
+  --sand-100:#F3E7D3; --sand-200:#EDE4D6; --sand-300:#E8DCC8; --sand-400:#D9C9AE;
+  --clay-400:#9C8B74; --clay-500:#8A7A66; --clay-600:#6A5A48; --clay-700:#3D3125; --ink:#23190F;
+  --green-700:#0A7A3E; --green-800:#096935; --green-text:#0A6B36; --green-50:#E6F4EC;
+  --violet-700:#5B3FA8; --violet-800:#4E3690; --violet-text:#4B3290; --violet-50:#EFEBFA;
+  --amber-700:#B25E00; --amber-800:#995100; --amber-text:#8A4B00; --amber-50:#FFF4E0;
+  --red-700:#C0261C; --red-800:#A52118; --red-text:#A1271B; --red-50:#FDECEA; --red-900:#A8170F;
+  --blue-700:#1F5BB5; --blue-800:#1B4E9C; --blue-text:#1A4A9C; --blue-50:#E8F0FE;
+  --exit-yellow:#F2B705; --exit-orange:#C2410C;
+
+  /* ---------- semantic: surfaces and text ---------- */
+  --color-bg-page:var(--paper);
+  --color-bg-surface:var(--white);
+  --color-bg-sunken:var(--sand-100);
+  --color-bg-inverse:var(--ink);
+  --color-bg-scrim:rgba(35,25,15,0.56);
+  --color-text-primary:var(--ink);
+  --color-text-secondary:var(--clay-700);
+  --color-text-muted:var(--clay-600);
+  --color-text-disabled:var(--clay-400);
+  --color-text-inverse:var(--paper);
+  --color-text-link:var(--color-brand-primary-text);
+  --color-border-subtle:var(--sand-200);
+  --color-border-default:var(--sand-400);
+  --color-border-strong:var(--clay-500);
+  --color-focus:var(--blue-700);
+  --focus-ring:0 0 0 2px #FFFFFF, 0 0 0 5px var(--blue-700);
+
+  /* ---------- brand slots (store-brandable). Default = Skipa ---------- */
+  --color-brand-primary:#23336B;
+  --color-brand-primary-hover:#1E2C5C;
+  --color-brand-primary-pressed:#19254D;
+  --color-brand-on-primary:#FFFFFF;
+  --color-brand-primary-text:#23336B;
+  --color-brand-primary-subtle:#E9EBF0;
+  --color-brand-accent:#E8A317;
+  --color-brand-on-accent:#23190F;
+  --color-brand-accent-subtle:#FDF6E8;
+
+  /* ---------- Skipa fixed (pay screen, receipt QR, Powered by). Never overridden ---------- */
+  --color-skipa-primary:#23336B; --color-skipa-on-primary:#FFFFFF; --color-skipa-accent:#E8A317;
+
+  /* ---------- status (fixed, BR-06) ---------- */
+  --color-status-success:var(--green-700); --color-status-success-hover:var(--green-800); --color-status-on-success:#FFFFFF; --color-status-success-bg:var(--green-50); --color-status-success-text:var(--green-text);
+  --color-status-pending:var(--violet-700); --color-status-pending-hover:var(--violet-800); --color-status-on-pending:#FFFFFF; --color-status-pending-bg:var(--violet-50); --color-status-pending-text:var(--violet-text);
+  --color-status-warning:var(--amber-700); --color-status-warning-hover:var(--amber-800); --color-status-on-warning:#FFFFFF; --color-status-warning-bg:var(--amber-50); --color-status-warning-text:var(--amber-text);
+  --color-status-error:var(--red-700); --color-status-error-hover:var(--red-800); --color-status-on-error:#FFFFFF; --color-status-error-bg:var(--red-50); --color-status-error-text:var(--red-text);
+  --color-status-info:var(--blue-700); --color-status-info-hover:var(--blue-800); --color-status-on-info:#FFFFFF; --color-status-info-bg:var(--blue-50); --color-status-info-text:var(--blue-text);
+
+  /* ---------- exit results (fixed, arm's length) ---------- */
+  --color-exit-clear:var(--green-700); --color-exit-on-clear:#FFFFFF;
+  --color-exit-flagged:var(--exit-yellow); --color-exit-on-flagged:var(--ink);
+  --color-exit-mismatch:var(--exit-orange); --color-exit-on-mismatch:#FFFFFF;
+  --color-exit-invalid:var(--red-900); --color-exit-on-invalid:#FFFFFF;
+  --pattern-exit-mismatch:repeating-linear-gradient(135deg, rgba(255,255,255,0.16) 0 14px, transparent 14px 28px);
+
+  /* ---------- space (8-point, with 4 and 12 half-steps) ---------- */
+  --space-0:0px; --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px; --space-6:32px; --space-7:40px; --space-8:48px; --space-9:64px; --space-10:80px;
+  --tap-min:48px;
+
+  /* ---------- radius ---------- */
+  --radius-xs:4px; --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px; --radius-pill:999px;
+
+  /* ---------- elevation ---------- */
+  --shadow-0:none;
+  --shadow-1:0 1px 2px rgba(35,25,15,0.08), 0 1px 1px rgba(35,25,15,0.04);
+  --shadow-2:0 4px 12px rgba(35,25,15,0.10);
+  --shadow-3:0 -8px 24px rgba(35,25,15,0.16);
+  --shadow-4:0 16px 48px rgba(35,25,15,0.24);
+
+  /* ---------- motion ---------- */
+  --dur-instant:0ms; --dur-fast:120ms; --dur-base:200ms; --dur-slow:320ms;
+  --ease-standard:cubic-bezier(0.2,0,0,1); --ease-enter:cubic-bezier(0,0,0.2,1); --ease-exit:cubic-bezier(0.4,0,1,1);
+
+  /* ---------- type ---------- */
+  --font-display:'Bricolage Grotesque','Inter',system-ui,sans-serif;
+  --font-ui:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+@media (prefers-reduced-motion: reduce){ :root{ --dur-fast:0ms; --dur-base:0ms; --dur-slow:0ms; } }
+
+/* ---------- store brand modes ---------- */
+[data-brand="adunni"]{
+  --color-brand-primary:#7A1F4A; --color-brand-primary-hover:#691B40; --color-brand-primary-pressed:#581635;
+  --color-brand-on-primary:#FFFFFF; --color-brand-primary-text:#7A1F4A; --color-brand-primary-subtle:#F2E9ED;
+  --color-brand-accent:#F2B705; --color-brand-on-accent:#23190F; --color-brand-accent-subtle:#FEF8E6;
+}
+[data-brand="harbour"]{
+  --color-brand-primary:#B3400F; --color-brand-primary-hover:#9A370D; --color-brand-primary-pressed:#812E0B;
+  --color-brand-on-primary:#FFFFFF; --color-brand-primary-text:#B3400F; --color-brand-primary-subtle:#F7ECE7;
+  --color-brand-accent:#1D6F8A; --color-brand-on-accent:#FFFFFF; --color-brand-accent-subtle:#E8F1F3;
+}
+
+/* ---------- text styles (mobile) ---------- */
+.t-display{font:800 32px/36px var(--font-display);letter-spacing:-0.02em}
+.t-h1{font:800 28px/32px var(--font-display);letter-spacing:-0.02em}
+.t-h2{font:700 22px/28px var(--font-display);letter-spacing:-0.01em}
+.t-h3{font:700 18px/24px var(--font-ui)}
+.t-body-lg{font:500 17px/24px var(--font-ui)}
+.t-body{font:400 15px/22px var(--font-ui)}
+.t-body-strong{font:600 15px/22px var(--font-ui)}
+.t-label{font:600 14px/20px var(--font-ui)}
+.t-caption{font:500 13px/18px var(--font-ui)}
+.t-micro{font:600 12px/16px var(--font-ui);letter-spacing:0.01em}
+.t-money-xl{font:700 40px/48px var(--font-ui);font-variant-numeric:tabular-nums;letter-spacing:-0.02em}
+.t-money-lg{font:700 28px/32px var(--font-ui);font-variant-numeric:tabular-nums;letter-spacing:-0.01em}
+.t-money{font:600 17px/24px var(--font-ui);font-variant-numeric:tabular-nums}
+.t-money-sm{font:600 15px/22px var(--font-ui);font-variant-numeric:tabular-nums}
+.t-ref{font:600 15px/22px var(--font-ui);font-variant-numeric:tabular-nums;letter-spacing:0.06em;text-transform:uppercase}
+/* desktop */
+.t-d-display{font:800 48px/56px var(--font-display);letter-spacing:-0.03em}
+.t-d-h1{font:800 32px/40px var(--font-display);letter-spacing:-0.02em}
+.t-d-h2{font:700 24px/32px var(--font-display);letter-spacing:-0.01em}
+.t-d-h3{font:700 18px/24px var(--font-ui)}
+.t-d-body{font:400 14px/20px var(--font-ui)}
+.t-d-label{font:600 13px/18px var(--font-ui)}
+.t-d-caption{font:500 12px/16px var(--font-ui)}
+.t-d-kpi{font:700 32px/40px var(--font-ui);font-variant-numeric:tabular-nums;letter-spacing:-0.02em}
+.t-d-table{font:400 14px/20px var(--font-ui);font-variant-numeric:tabular-nums}
+/* exit mode */
+.t-exit-result{font:800 56px/60px var(--font-display);letter-spacing:-0.02em}
+.t-exit-count{font:700 96px/96px var(--font-ui);font-variant-numeric:tabular-nums;letter-spacing:-0.03em}
+.t-exit-detail{font:600 22px/28px var(--font-ui)}
+
+/* ---------- behaviour ---------- */
+.sk button:focus-visible,.sk a:focus-visible,.sk input:focus-visible,.sk select:focus-visible,.sk textarea:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.sk *{box-sizing:border-box}
+
+/* ---------- animation helpers ---------- */
+@keyframes sk-spin{to{transform:rotate(360deg)}}
+@keyframes sk-shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+@keyframes sk-pulse{0%,100%{opacity:1}50%{opacity:0.35}}
+.sk-spin{animation:sk-spin 0.9s linear infinite;transform-origin:50% 50%}
+.sk-skeleton{background:linear-gradient(90deg,var(--sand-100) 0%,var(--sand-200) 50%,var(--sand-100) 100%);background-size:200% 100%;animation:sk-shimmer 1.4s ease-in-out infinite}
+.sk-pulse{animation:sk-pulse 1.6s ease-in-out infinite}
+@media (prefers-reduced-motion: reduce){.sk-spin{animation-duration:2.4s}.sk-skeleton,.sk-pulse{animation:none}}
+
+/* links */
+.sk a{color:var(--color-text-link);text-underline-offset:3px}
+
+/* ---------- v1.1 additions (Stage 7 review) ---------- */
+:root{
+  --color-exit-flagged-bg:#FEF3C7; --color-exit-flagged-subtle:#FFFBEB;
+  --color-exit-mismatch-bg:#FCE7DD; --color-exit-mismatch-text:#8A2D08;
+  --chart-1:#4A5FB0; --chart-1-soft:#A9B4DC; --chart-2:#B8820F; --chart-3:#0E9484; --chart-4:#C0573A; --chart-grid:#EDE4D6;
+  --color-on-dark-muted:#C9D2F0;
+}
+/* Skipa's own pages inside a store-branded wrapper reset the brand slots */
+[data-brand="skipa"]{
+  --color-brand-primary:#23336B; --color-brand-primary-hover:#1E2C5C; --color-brand-primary-pressed:#19254D;
+  --color-brand-on-primary:#FFFFFF; --color-brand-primary-text:#23336B; --color-brand-primary-subtle:#E9EBF0;
+  --color-brand-accent:#E8A317; --color-brand-on-accent:#23190F; --color-brand-accent-subtle:#FDF6E8;
+}

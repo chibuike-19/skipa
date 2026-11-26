@@ -1,0 +1,43 @@
+# Replace the three placeholders with real GitHub users or teams before enabling
+# "Require review from Code Owners" on main:
+#   @REPLACE-lead      the Skipa lead engineer
+#   @REPLACE-backend   the backend agent's account
+#   @REPLACE-frontend  the frontend agent's account
+# Later rules win, so the most specific rules come last.
+
+*                                   @REPLACE-lead
+
+# Backend agent
+/apps/api/                          @REPLACE-backend @REPLACE-lead
+/db/                                @REPLACE-backend @REPLACE-lead
+/infra/                             @REPLACE-backend @REPLACE-lead
+/.github/                           @REPLACE-backend @REPLACE-lead
+/packages/config/                   @REPLACE-backend @REPLACE-lead
+
+# Shared: owned by the backend agent, reviewed by the frontend agent (brief §1)
+/packages/contracts/                @REPLACE-backend @REPLACE-frontend @REPLACE-lead
+/packages/domain/                   @REPLACE-backend @REPLACE-frontend @REPLACE-lead
+/api/openapi.v1.yaml                @REPLACE-backend @REPLACE-frontend @REPLACE-lead
+
+# Frontend agent
+/apps/shopper/                      @REPLACE-frontend @REPLACE-lead
+/apps/exit/                         @REPLACE-frontend @REPLACE-lead
+/apps/store/                        @REPLACE-frontend @REPLACE-lead
+/apps/admin/                        @REPLACE-frontend @REPLACE-lead
+/packages/ui/                       @REPLACE-frontend @REPLACE-lead
+/packages/tokens/                   @REPLACE-frontend @REPLACE-lead
+/packages/api-client/               @REPLACE-frontend @REPLACE-lead
+/packages/mocks/                    @REPLACE-frontend @REPLACE-lead
+/packages/analytics/                @REPLACE-frontend @REPLACE-lead
+
+# Shared tests
+/e2e/                               @REPLACE-backend @REPLACE-frontend @REPLACE-lead
+
+# Money paths: always the lead (AD §5.3)
+/apps/api/src/modules/payments/     @REPLACE-lead
+/apps/api/src/modules/exit/         @REPLACE-lead
+/apps/api/src/modules/refunds/      @REPLACE-lead
+/apps/api/src/modules/recon/        @REPLACE-lead
+/apps/api/src/integrations/paystack/ @REPLACE-lead
+/packages/domain/src/money.ts       @REPLACE-lead
+/packages/domain/src/fees.ts        @REPLACE-lead

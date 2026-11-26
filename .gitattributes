@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.pdf binary
+*.png binary
+*.webp binary
+# Generated from packages/contracts once the contract pipeline lands (M0).
+api/openapi.v1.yaml linguist-generated=false
+pnpm-lock.yaml -diff linguist-generated

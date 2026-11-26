@@ -1,0 +1,46 @@
+{
+  "schema": "Catalogue",
+  "data": {
+    "branchId": "0193a1f2-0000-7000-8000-0000000000a1",
+    "version": 4821,
+    "generatedAt": "2026-11-25T12:00:00Z",
+    "categories": [
+      {
+        "id": "0193a1f2-2222-7000-8000-000000000001",
+        "name": "Drinks",
+        "active": true
+      },
+      {
+        "id": "0193a1f2-2222-7000-8000-000000000002",
+        "name": "Alcoholic drinks",
+        "active": false
+      }
+    ],
+    "products": [
+      {
+        "id": "0193a1f2-3333-7000-8000-000000000001",
+        "barcode": "6156000231187",
+        "name": "Malt drink 33 cl",
+        "priceKobo": 40000,
+        "categoryId": "0193a1f2-2222-7000-8000-000000000001",
+        "status": "available"
+      },
+      {
+        "id": "0193a1f2-3333-7000-8000-000000000002",
+        "barcode": "5000213003218",
+        "name": "Stout 60 cl",
+        "priceKobo": 120000,
+        "categoryId": "0193a1f2-2222-7000-8000-000000000002",
+        "status": "category_off"
+      },
+      {
+        "id": "0193a1f2-3333-7000-8000-000000000003",
+        "barcode": "6154000057038",
+        "name": "Vegetable oil 1 L",
+        "priceKobo": 320000,
+        "categoryId": "0193a1f2-2222-7000-8000-000000000001",
+        "status": "till_only"
+      }
+    ]
+  }
+}

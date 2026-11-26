@@ -1,0 +1,37 @@
+{
+  "schema": "ExitDecision",
+  "data": {
+    "checkId": "0193a1f2-8888-7000-8000-000000000001",
+    "decision": "flagged",
+    "invalidReason": null,
+    "usedAt": null,
+    "randomCheck": false,
+    "largeBasket": true,
+    "expectedWeightGrams": 9420,
+    "weightRangeGrams": {
+      "min": 9140,
+      "max": 9700
+    },
+    "receipt": {
+      "receiptNumber": "LK-04812",
+      "paidAt": "2026-11-25T14:02:10Z",
+      "itemCount": 19
+    },
+    "items": [
+      {
+        "orderItemId": "0193a1f2-5555-7000-8000-000000000010",
+        "name": "Baby formula 900 g",
+        "quantity": 1,
+        "flagged": true,
+        "flagReason": "Extra-checks category: Baby care"
+      },
+      {
+        "orderItemId": "0193a1f2-5555-7000-8000-000000000011",
+        "name": "Parboiled rice 5 kg",
+        "quantity": 2,
+        "flagged": false,
+        "flagReason": null
+      }
+    ]
+  }
+}

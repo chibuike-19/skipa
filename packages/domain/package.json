@@ -1,0 +1,7 @@
+{
+  "name": "@skipa/domain",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Pure TypeScript shared by the API and the apps: money (kobo), fees, flagging, random-check blocks, state machines, RBAC, contrast, WAT time."
+}

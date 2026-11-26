@@ -1,0 +1,55 @@
+{
+  "schema": "Receipt",
+  "data": {
+    "id": "0193a1f2-7777-7000-8000-000000000001",
+    "receiptNumber": "LK-04822",
+    "orderId": "0193a1f2-4444-7000-8000-000000000001",
+    "store": {
+      "displayName": "Adunni Mart",
+      "logoSquareUrl": "https://assets.skipa.ng/o/adunni/logo-sq.3f9a.webp",
+      "logoWideUrl": "https://assets.skipa.ng/o/adunni/logo-wide.8c21.webp",
+      "coverUrl": "https://assets.skipa.ng/o/adunni/cover.1b7e.webp",
+      "primary": "#7A1F4A",
+      "primaryHover": "#691B40",
+      "primaryPressed": "#581635",
+      "onPrimary": "#FFFFFF",
+      "primaryText": "#7A1F4A",
+      "primarySubtle": "#F2E9ED",
+      "accent": "#F2B705",
+      "onAccent": "#23190F",
+      "accentSubtle": "#FEF8E6",
+      "welcomeMessage": "Skip the queue at Adunni Mart Lekki. Scan, pay and walk out.",
+      "receiptHeader": "Adunni Mart · Lekki Phase 1",
+      "receiptFooter": "Thank you for shopping with us. Returns at the service desk within 7 days.",
+      "socialLinks": {
+        "instagram": "https://instagram.com/adunnimart"
+      }
+    },
+    "branchName": "Lekki Phase 1",
+    "issuedAt": "2026-11-25T13:35:41Z",
+    "items": [
+      {
+        "id": "0193a1f2-5555-7000-8000-000000000001",
+        "name": "Malt drink 33 cl",
+        "barcode": "6156000231187",
+        "quantity": 2,
+        "unitPriceKobo": 40000,
+        "lineTotalKobo": 80000,
+        "categoryName": "Drinks"
+      }
+    ],
+    "itemCount": 2,
+    "totalKobo": 80000,
+    "paymentMethod": "Card",
+    "cardLast4": "4081",
+    "exit": {
+      "status": "valid",
+      "validUntil": "2026-11-25T14:05:41Z",
+      "usedAt": null,
+      "qrPayload": "v1.k1.eyJqIjoiMDE5M2ExZjIiLCJiIjoiYTEiLCJlIjoxNzk1NTI5MTQxfQ.c2lnbmF0dXJl"
+    },
+    "refund": null,
+    "rating": null,
+    "ratingPrompt": false
+  }
+}
