@@ -1,0 +1,78 @@
+/* @skipa/ui stylesheet: import once at the top of each app's CSS (after nothing else).
+   tokens.css goes into the `base` layer: after Tailwind's preflight (so its `.sk a` link colour and
+   focus ring apply) but below utilities (so a component's `text-*` wins over `.sk a`). Variables
+   are unaffected: the token theme is `@theme inline reference` and defines none of its own. */
+@import 'tailwindcss';
+@import '@skipa/tokens/fonts.css';
+@import '@skipa/tokens/tokens.css' layer(base);
+@import '@skipa/tokens/tailwind-theme.css';
+
+/* Scan this package's components for class names wherever the stylesheet is imported. */
+@source '.';
+
+/* Overlay motion (Eng notes: sheets and dialogs 320 ms in, 200 ms out; scrim fades in).
+   Durations are tokens, so reduced motion makes them 0 (tokens.css). Radix waits for the
+   closing animation before unmounting. */
+@keyframes sk-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes sk-sheet-out {
+  to {
+    transform: translateY(100%);
+  }
+}
+@keyframes sk-panel-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes sk-panel-out {
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes sk-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes sk-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes sk-hold {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.sk-scrim[data-state='open'] {
+  animation: sk-fade-in var(--dur-slow) var(--ease-enter);
+}
+.sk-scrim[data-state='closed'] {
+  animation: sk-fade-out var(--dur-base) var(--ease-exit);
+}
+.sk-sheet[data-state='open'] {
+  animation: sk-sheet-in var(--dur-slow) var(--ease-enter);
+}
+.sk-sheet[data-state='closed'] {
+  animation: sk-sheet-out var(--dur-base) var(--ease-exit);
+}
+.sk-panel[data-state='open'] {
+  animation: sk-panel-in var(--dur-slow) var(--ease-enter);
+}
+.sk-panel[data-state='closed'] {
+  animation: sk-panel-out var(--dur-base) var(--ease-exit);
+}
+.sk-dialog[data-state='open'] {
+  animation: sk-fade-in var(--dur-slow) var(--ease-enter);
+}
+.sk-dialog[data-state='closed'] {
+  animation: sk-fade-out var(--dur-base) var(--ease-exit);
+}
