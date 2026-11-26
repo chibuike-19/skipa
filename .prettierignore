@@ -10,3 +10,5 @@ api/openapi.v1.yaml
 packages/mocks/src/generated/
 # Pack fixtures, moved unchanged from docs/architecture-pack/mocks/fixtures.
 packages/mocks/fixtures/
+# Generated from the contract by `pnpm api-client:gen`; a test compares it byte for byte.
+packages/api-client/src/generated/

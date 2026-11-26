@@ -24,7 +24,8 @@
     "contract:build": "pnpm --filter @skipa/contracts contract:build",
     "contract:check": "pnpm --filter @skipa/contracts contract:check",
     "db:seed": "pnpm --filter @skipa/api db:seed",
-    "mocks:validate": "pnpm --filter @skipa/mocks mocks:validate"
+    "mocks:validate": "pnpm --filter @skipa/mocks mocks:validate",
+    "api-client:gen": "pnpm --filter @skipa/api-client api-client:gen"
   },
   "devDependencies": {
     "@commitlint/cli": "21.2.4",
