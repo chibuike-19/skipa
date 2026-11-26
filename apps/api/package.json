@@ -10,7 +10,8 @@
     "test": "vitest run --project unit",
     "test:int": "vitest run --project int",
     "dev": "node --env-file-if-exists=.env --watch src/server.ts",
-    "start": "node src/server.ts"
+    "start": "node src/server.ts",
+    "db:seed": "node --env-file-if-exists=.env scripts/db-seed.ts"
   },
   "description": "Fastify HTTP API (src/server.ts) and pg-boss worker (src/worker.ts).",
   "dependencies": {
