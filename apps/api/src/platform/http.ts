@@ -16,12 +16,17 @@ export const EXPOSED_HEADERS = ['X-Request-Id', 'Idempotent-Replayed', 'Retry-Af
 const ALLOWED_METHODS = 'GET, POST, PUT, PATCH, DELETE';
 
 export function registerHttpPolicy(app: FastifyInstance, origins: readonly string[]) {
-  const allowed = new Set(origins.map((o) => new URL(o).origin));
+  // Configured origin → itself. The response echoes the configured string, never request input.
+  const allowed = new Map(origins.map((o) => [new URL(o).origin, new URL(o).origin]));
 
   app.addHook('onRequest', async (request, reply) => {
     const origin = request.headers.origin;
-    if (origin !== undefined && allowed.has(origin)) {
-      reply.header('Access-Control-Allow-Origin', origin);
+    const allowedOrigin = origin === undefined ? undefined : allowed.get(origin);
+    if (allowedOrigin !== undefined) {
+      // Value comes from the configured allow-list (APP_ORIGINS), and unknown origins get no CORS
+      // headers (test/int/platform/app.int.test.ts). The rule flags any non-literal value.
+      // nosemgrep: javascript.express.security.cors-misconfiguration.cors-misconfiguration
+      reply.header('Access-Control-Allow-Origin', allowedOrigin);
       reply.header('Access-Control-Allow-Credentials', 'true');
       reply.header('Access-Control-Expose-Headers', EXPOSED_HEADERS.join(', '));
     }
@@ -30,7 +35,7 @@ export function registerHttpPolicy(app: FastifyInstance, origins: readonly strin
       request.method === 'OPTIONS' &&
       request.headers['access-control-request-method'] !== undefined
     ) {
-      if (origin !== undefined && allowed.has(origin)) {
+      if (allowedOrigin !== undefined) {
         reply.header('Access-Control-Allow-Methods', ALLOWED_METHODS);
         reply.header('Access-Control-Allow-Headers', ALLOWED_HEADERS.join(', '));
         reply.header('Access-Control-Max-Age', '600');

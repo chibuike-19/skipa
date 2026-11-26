@@ -51,7 +51,13 @@ Local branches, stacked, merge in this order: `chore/SKP-0-bootstrap` → `feat/
   at runtime; CI contract job with the `contract-change` label rule (ADR-35). The YAML layout
   changed once with the same meaning: label this PR contract-change (formatting only) for the
   frontend agent.
-- Next: CI security scans + SOPS layout; seed; staging playbook.
+- PR 6 (`ci/SKP-5-security-scans`): done. CI security job: Gitleaks (full history), Semgrep CE,
+  Trivy, pnpm audit, SOPS-encryption guard. All clean locally at the pinned versions. Two
+  reviewed false positives: Gitleaks on fake values in a config test (the test builds
+  them at runtime, so history holds no secret-shaped literal) and one Semgrep CORS rule (`nosemgrep` with reason; covered
+  by integration tests). SOPS layout documented in `infra/secrets/README.md`; encrypted files
+  wait for the lead's age public key.
+- Next: seed; staging playbook.
 - Decision: pg-boss is deferred to M1, where the first jobs arrive. `/health/ready` reports the
   queue as `not_installed`.
 
@@ -71,6 +77,8 @@ Local branches, stacked, merge in this order: `chore/SKP-0-bootstrap` → `feat/
 - **CODEOWNERS handles.** Question: which GitHub users or teams are the lead, the backend agent and
   the frontend agent? Default if unanswered by 30 Nov 2026: the placeholders stay, and "Require
   review from Code Owners" stays off until they're replaced.
+- **SOPS recipients:** question: what are the age public keys (lead, staging server, production
+  server)? Default: the layout and guard are in place; no encrypted files until the keys arrive.
 - **Staging provisioning** needs Hetzner access, the domain, the lead's age public key and
   Cloudflare access. Default (agreed): write and check the playbook locally; M0 reports staging as
   not provisioned.
