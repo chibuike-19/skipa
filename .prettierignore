@@ -10,5 +10,7 @@ api/openapi.v1.yaml
 packages/mocks/src/generated/
 # Pack fixtures, moved unchanged from docs/architecture-pack/mocks/fixtures.
 packages/mocks/fixtures/
+# Generated from the contract by `pnpm api-client:gen`; a test compares it byte for byte.
+packages/api-client/src/generated/
 # Copied verbatim from the Claude Design canvas (tokens.css v1.1); a design update replaces the file.
 packages/tokens/src/tokens.css
