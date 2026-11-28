@@ -41,6 +41,8 @@ jobs:
           restore-keys: pnpm-${{ runner.os }}-
       - run: pnpm install --frozen-lockfile
       - run: pnpm format:check
+      # Generated token files (packages/tokens/dist) are imported by app configs; lint needs their types.
+      - run: pnpm tokens:build
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
