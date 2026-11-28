@@ -3,6 +3,9 @@
   "version": "1.1.0",
   "private": true,
   "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
   "description": "Design tokens v1.1 from the Claude Design canvas → CSS variables, Tailwind 4 @theme and a TypeScript object.",
   "exports": {
     ".": "./dist/tokens.ts",

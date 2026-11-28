@@ -13,9 +13,23 @@ export function preloadInter(): Plugin {
     transformIndexHtml: {
       order: 'post',
       handler(_html, ctx) {
-        const file = Object.keys(ctx.bundle ?? {}).find((f) => f.includes(stem) && f.endsWith('.woff2'));
+        const file = Object.keys(ctx.bundle ?? {}).find(
+          (f) => f.includes(stem) && f.endsWith('.woff2'),
+        );
         if (file === undefined) return [];
-        return [{ tag: 'link', attrs: { rel: 'preload', href: `/${file}`, as: 'font', type: 'font/woff2', crossorigin: '' }, injectTo: 'head-prepend' }];
+        return [
+          {
+            tag: 'link',
+            attrs: {
+              rel: 'preload',
+              href: `/${file}`,
+              as: 'font',
+              type: 'font/woff2',
+              crossorigin: '',
+            },
+            injectTo: 'head-prepend',
+          },
+        ];
       },
     },
   };

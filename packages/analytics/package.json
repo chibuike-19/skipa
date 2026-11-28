@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "sideEffects": false,
   "description": "Client observability: personal-data scrubbing and GlitchTip (Sentry SDK) setup through the API tunnel. track() and the outbox arrive with contracts/events.ts (backend M1).",
   "exports": {
     "./scrub": "./src/scrub.ts",

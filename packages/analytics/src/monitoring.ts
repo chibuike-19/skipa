@@ -5,6 +5,7 @@
 //
 // The SDK (~25 KB gz) is loaded after first paint to keep the shopper shell under its budget
 // (brief §12). Errors raised before it loads are buffered and sent once it is ready.
+import type * as SentryModule from './sentry.ts';
 import { REMOVED, scrubPersonalData, scrubText, scrubUrl } from './scrub.ts';
 
 export interface MonitoringOptions {
@@ -26,7 +27,7 @@ interface ApiErrorLike {
   requestId: string | null;
 }
 
-type Sentry = typeof import('@sentry/react');
+type Sentry = typeof SentryModule;
 
 let sentry: Sentry | undefined;
 const early: unknown[] = [];
@@ -34,7 +35,13 @@ let started = false;
 
 /** Minimal event shape we touch in beforeSend (the SDK's own type is wider). */
 interface ScrubbableEvent {
-  request?: { url?: string; query_string?: unknown; cookies?: unknown; headers?: unknown; data?: unknown };
+  request?: {
+    url?: string;
+    query_string?: unknown;
+    cookies?: unknown;
+    headers?: unknown;
+    data?: unknown;
+  };
   user?: unknown;
   message?: string;
   exception?: { values?: { value?: string }[] };
@@ -54,7 +61,13 @@ export function scrubEvent<E extends ScrubbableEvent>(event: E): E {
   delete e.user;
   if (e.message !== undefined) e.message = scrubText(e.message);
   if (e.exception?.values !== undefined) {
-    e.exception = { ...e.exception, values: e.exception.values.map((v) => ({ ...v, value: v.value === undefined ? undefined : scrubText(v.value) })) };
+    e.exception = {
+      ...e.exception,
+      values: e.exception.values.map((v) => ({
+        ...v,
+        value: v.value === undefined ? undefined : scrubText(v.value),
+      })),
+    };
   }
   e.extra = scrubPersonalData(e.extra);
   e.contexts = scrubPersonalData(e.contexts);
@@ -62,7 +75,9 @@ export function scrubEvent<E extends ScrubbableEvent>(event: E): E {
   return e;
 }
 
-export function scrubBreadcrumb<B extends { message?: string; data?: Record<string, unknown> }>(crumb: B): B {
+export function scrubBreadcrumb<B extends { message?: string; data?: Record<string, unknown> }>(
+  crumb: B,
+): B {
   const b = { ...crumb };
   if (b.message !== undefined) b.message = scrubText(b.message);
   if (b.data !== undefined) {
@@ -86,22 +101,35 @@ export function startMonitoring(options: MonitoringOptions): void {
   addEventListener('error', onEarlyError);
   addEventListener('unhandledrejection', onEarlyError);
   const load = async () => {
-    const s = await import('@sentry/react');
+    const s = await import('./sentry.ts');
     s.init({
+      defaultIntegrations: false,
+      integrations: [
+        s.functionToStringIntegration(),
+        s.browserApiErrorsIntegration(),
+        // Sentry 11 records console output only via consoleIntegration, which we leave out.
+        s.breadcrumbsIntegration({ dom: true, fetch: true, history: true, xhr: true }),
+        s.globalHandlersIntegration(),
+        s.linkedErrorsIntegration(),
+        s.dedupeIntegration(),
+        s.httpContextIntegration(),
+      ],
       dsn: options.dsn,
       tunnel: new URL('/v1/monitoring/tunnel', options.apiUrl).href,
       release: options.release,
       environment: options.environment,
       initialScope: { tags: { app: options.app } },
       beforeSend: (event) => scrubEvent(event as ScrubbableEvent) as typeof event,
-      beforeBreadcrumb: (crumb) => (crumb === null ? null : scrubBreadcrumb(crumb as { message?: string; data?: Record<string, unknown> }) as typeof crumb),
+      beforeBreadcrumb: (crumb) => scrubBreadcrumb(crumb),
     });
     sentry = s;
     removeEventListener('error', onEarlyError);
     removeEventListener('unhandledrejection', onEarlyError);
     for (const error of early.splice(0)) s.captureException(error);
   };
-  const idle = (globalThis as { requestIdleCallback?: (cb: () => void) => void }).requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 1));
+  const idle =
+    (globalThis as { requestIdleCallback?: (cb: () => void) => void }).requestIdleCallback ??
+    ((cb: () => void) => setTimeout(cb, 1));
   idle(() => {
     void load();
   });
@@ -112,21 +140,36 @@ export function startMonitoring(options: MonitoringOptions): void {
  * error report only for server faults (5xx) and codes the catalogue doesn't know. User errors
  * (wrong code, cart limit) and being offline are expected and not reported.
  */
-export function reportApiError(error: ApiErrorLike, request: { method: string; path: string; requestId: string }): void {
+export function reportApiError(
+  error: ApiErrorLike,
+  request: { method: string; path: string; requestId: string },
+): void {
   const crumb = {
     category: 'api',
     level: 'warning' as const,
-    message: `${request.method} ${request.path} → ${error.status === null ? 'network' : String(error.status)} ${error.rawCode ?? ''}`.trim(),
-    data: { method: request.method, path: scrubUrl(request.path), status: error.status, code: error.rawCode, request_id: request.requestId },
+    message:
+      `${request.method} ${request.path} → ${error.status === null ? 'network' : String(error.status)} ${error.rawCode ?? ''}`.trim(),
+    data: {
+      method: request.method,
+      path: scrubUrl(request.path),
+      status: error.status,
+      code: error.rawCode,
+      request_id: request.requestId,
+    },
   };
   if (sentry === undefined) return;
   sentry.addBreadcrumb(crumb);
   const serverFault = error.kind === 'api' && (error.status ?? 0) >= 500;
-  const unknownCode = error.kind === 'api' && error.code === 'SYS-500' && error.rawCode !== 'SYS-500';
+  const unknownCode =
+    error.kind === 'api' && error.code === 'SYS-500' && error.rawCode !== 'SYS-500';
   if (serverFault || unknownCode) {
     sentry.captureMessage(`API ${error.rawCode ?? 'error'} on ${request.method} ${request.path}`, {
       level: 'error',
-      tags: { request_id: request.requestId, error_code: error.rawCode ?? 'none', reference: error.requestId ?? REMOVED },
+      tags: {
+        request_id: request.requestId,
+        error_code: error.rawCode ?? 'none',
+        reference: error.requestId ?? REMOVED,
+      },
     });
   }
 }

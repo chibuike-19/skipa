@@ -9,10 +9,20 @@
 export const REMOVED = '[removed]';
 
 /** Keys whose values are always removed (matched case-insensitively, anywhere in the key). */
-const SENSITIVE_KEY = /(?:^|[_\-.]|(?<=[a-z])(?=[A-Z]))(name|phone|email|lat|lng|latitude|longitude|coords?|card|pan|cvv|otp|token|password|secret|cookie|authorization|account_?number|destination)(?:$|[_\-.A-Z])/i;
+const SENSITIVE_KEY =
+  /(?:^|[_\-.]|(?<=[a-z])(?=[A-Z]))(name|phone|email|lat|lng|latitude|longitude|coords?|card|pan|cvv|otp|token|password|secret|cookie|authorization|account_?number|destination)(?:$|[_\-.A-Z])/i;
 
 /** Keys that look sensitive by the rule above but are safe identifiers we need. */
-const SAFE_KEYS = new Set(['errorCode', 'error_code', 'rawCode', 'storeName', 'branchName', 'displayName', 'screen', 'event_name']);
+const SAFE_KEYS = new Set([
+  'errorCode',
+  'error_code',
+  'rawCode',
+  'storeName',
+  'branchName',
+  'displayName',
+  'screen',
+  'event_name',
+]);
 
 const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
 // Nigerian and international phone numbers: +234 803 123 4567, 08031234567, 803 123 4567.
@@ -64,10 +74,14 @@ export function scrubPersonalData<T>(value: T, depth = 8, seen = new WeakSet<obj
   if (value === null || typeof value !== 'object') return value;
   if (seen.has(value) || depth <= 0) return REMOVED as T;
   seen.add(value);
-  if (Array.isArray(value)) return value.map((v: unknown) => scrubPersonalData(v, depth - 1, seen)) as T;
+  if (Array.isArray(value))
+    return value.map((v: unknown) => scrubPersonalData(v, depth - 1, seen)) as T;
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-    out[k] = isSensitive(k, v) && v !== null && v !== undefined ? REMOVED : scrubPersonalData(v, depth - 1, seen);
+    out[k] =
+      isSensitive(k, v) && v !== null && v !== undefined
+        ? REMOVED
+        : scrubPersonalData(v, depth - 1, seen);
   }
   return out as T;
 }
@@ -77,7 +91,8 @@ export function scrubUrl(url: string): string {
   try {
     const u = new URL(url, 'https://x.invalid');
     for (const key of [...u.searchParams.keys()]) {
-      if (isSensitiveKey(key) || key === 'q' || key === 'trxref' || key === 'reference') u.searchParams.set(key, REMOVED);
+      if (isSensitiveKey(key) || key === 'q' || key === 'trxref' || key === 'reference')
+        u.searchParams.set(key, REMOVED);
     }
     const out = u.origin === 'https://x.invalid' ? `${u.pathname}${u.search}` : u.href;
     return scrubText(out);
