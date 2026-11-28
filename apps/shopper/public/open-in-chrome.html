@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en-NG">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Open Skipa in Chrome</title>
+    <!--
+      AD-11, NF-21. Served to Opera Mini before (and without) the app bundle, so it cannot use the
+      token pipeline: the few values below are copied from tokens.css v1.1 (paper, surface, ink,
+      clay-700, indigo-700). Text contrast: ink on surface 17:1, white on indigo 11:1.
+    -->
+    <style>
+      body {
+        margin: 0;
+        background: #fbf5ea;
+        color: #23190f;
+        font:
+          400 16px/24px system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+      }
+      main {
+        max-width: 420px;
+        margin: 0 auto;
+        padding: 48px 24px;
+      }
+      h1 {
+        font-size: 24px;
+        line-height: 32px;
+        margin: 0 0 12px;
+      }
+      p {
+        margin: 0 0 16px;
+        color: #3d3125;
+      }
+      .link {
+        display: block;
+        word-break: break-all;
+        padding: 12px 16px;
+        margin: 0 0 16px;
+        background: #ffffff;
+        border: 1.5px solid #d9c9ae;
+        border-radius: 12px;
+        font-weight: 600;
+      }
+      button {
+        width: 100%;
+        min-height: 56px;
+        border: 0;
+        border-radius: 999px;
+        background: #23336b;
+        color: #ffffff;
+        font:
+          700 17px/24px system-ui,
+          sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Open Skipa in Chrome</h1>
+      <p>Skipa needs Chrome to scan and pay. Open this page in Chrome.</p>
+      <p>Copy this link and paste it into Chrome:</p>
+      <span class="link" id="link">https://shop.skipa.ng/</span>
+      <button type="button" id="copy">Copy link</button>
+    </main>
+    <script>
+      (function () {
+        var from = new URLSearchParams(location.search).get('from') || '/';
+        // Only same-site paths: never echo an outside URL.
+        if (from.charAt(0) !== '/' || from.charAt(1) === '/') from = '/';
+        var url = location.origin + from;
+        var link = document.getElementById('link');
+        var button = document.getElementById('copy');
+        link.textContent = url;
+        button.onclick = function () {
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(function () {
+              button.textContent = 'Copied';
+            });
+          } else {
+            var range = document.createRange();
+            range.selectNodeContents(link);
+            var sel = getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            button.textContent = 'Now copy the selected link';
+          }
+        };
+      })();
+    </script>
+  </body>
+</html>

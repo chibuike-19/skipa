@@ -1,0 +1,25 @@
+[
+  {
+    "name": "Shopper shell: entry JS (F0 acceptance: < 120 KB gz)",
+    "path": "dist/assets/index-*.js",
+    "gzip": true,
+    "limit": "120 KB"
+  },
+  {
+    "name": "Shopper first load: HTML + entry JS + CSS + fonts, excluding catalogue (brief §12: < 500 KB gz)",
+    "path": [
+      "dist/index.html",
+      "dist/assets/index-*.js",
+      "dist/assets/index-*.css",
+      "dist/assets/*.woff2"
+    ],
+    "gzip": true,
+    "limit": "500 KB"
+  },
+  {
+    "name": "Error reporting chunk, loaded after first paint",
+    "path": "dist/assets/sentry-*.js",
+    "gzip": true,
+    "limit": "35 KB"
+  }
+]

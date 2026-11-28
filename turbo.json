@@ -22,6 +22,10 @@
         "DATABASE_PLATFORM_URL",
         "DATABASE_MIGRATION_URL"
       ]
+    },
+    "dev:mocks": {
+      "cache": false,
+      "persistent": true
     }
   }
 }
