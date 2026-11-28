@@ -41,7 +41,7 @@ describe('generated contract', () => {
 });
 
 describe('pack fixtures validate against the Zod schemas at runtime', () => {
-  const dir = repo('docs/architecture-pack/mocks/fixtures');
+  const dir = repo('packages/mocks/fixtures');
   const files = readdirSync(dir).filter((f) => f.endsWith('.json'));
 
   it('finds the 9 fixtures', () => {

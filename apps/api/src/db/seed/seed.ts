@@ -1,6 +1,6 @@
 // pnpm db:seed (brief §9, AD §7.5): fictional data for local and staging, never production.
 // Deterministic IDs and ON CONFLICT DO NOTHING make it safe to run again. Where the pack fixtures
-// show the same entity, the seed uses the fixture's IDs and values (docs/architecture-pack/mocks).
+// show the same entity, the seed uses the fixture's IDs and values (packages/mocks/fixtures).
 //
 // Not seeded here yet, each waiting for the module that owns it: 30 days of activity (each
 // milestone seeds its own area: lead's decision, 26 Nov 2026), branding versions (need the
@@ -25,7 +25,7 @@ export function seedId(label: string): string {
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-8${h.slice(13, 16)}-${variant}${h.slice(17, 20)}-${h.slice(20, 32)}`;
 }
 
-// IDs and values shared with docs/architecture-pack/mocks/fixtures (check-in.json, catalogue.json).
+// IDs and values shared with packages/mocks/fixtures (check-in.json, catalogue.json).
 export const FIXTURE = {
   adunniOrgId: '0193a1f2-0000-7000-8000-00000000000a',
   lekkiBranchId: '0193a1f2-0000-7000-8000-0000000000a1',
