@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Shared React components, one per Claude Design canvas component (brief \u00a78.3).",
+  "sideEffects": [
+    "*.css"
+  ],
+  "description": "Shared React components, one per Claude Design canvas component (brief §8.3).",
   "exports": {
     ".": "./src/index.ts",
     "./styles.css": "./src/styles.css"

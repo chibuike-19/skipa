@@ -1,0 +1,65 @@
+// All store-dashboard copy (brief §4, §16): plain English from the canvas content guide (F-Content).
+export const en = {
+  app: { name: 'Skipa for stores' },
+  common: {
+    tryAgain: 'Try again',
+    goHome: 'Go to Live',
+    reference: 'Reference',
+    signOut: 'Sign out',
+  },
+  // RB-02: staff sign in with their work email and a 6-digit emailed code.
+  signIn: {
+    title: 'Sign in to your store',
+    emailLabel: 'Work email',
+    emailHint: 'We’ll email you a 6-digit code.',
+    sendCode: 'Email me a code',
+    codeTitle: 'Enter the code',
+    codeBody: (to: string) => `We sent a 6-digit code to ${to}.`,
+    codeLabel: 'Code',
+    digit: (i: number) => `Digit ${i}`,
+    verify: 'Sign in',
+    changeEmail: 'Use a different email',
+    secondStep: 'This account needs a second sign-in step. Contact Skipa support.',
+  },
+  nav: {
+    label: 'Store dashboard',
+    product: 'for stores',
+    live: 'Live',
+    receipts: 'Receipts',
+    exitChecks: 'Exit checks',
+    refunds: 'Refunds',
+    support: 'Support',
+    analytics: 'Analytics',
+    reconciliation: 'Reconciliation',
+    catalogue: 'Catalogue',
+    branding: 'Branding',
+    faqs: 'FAQs',
+    shoppers: 'Shoppers',
+    staff: 'Staff',
+    settings: 'Settings',
+    privacy: 'Privacy',
+  },
+  // F0 shell: each section is built in F5.
+  shell: {
+    signedInAs: (name: string) => `Signed in as ${name}`,
+    placeholder: 'This section is built in F5.',
+  },
+  notFound: {
+    title: 'We can’t find that page',
+    body: 'The link may be old. Use the menu to find what you need.',
+  },
+  errors: {
+    titles: {
+      retry: 'That didn’t work',
+      signIn: 'Please sign in again',
+      offline: 'You’re offline',
+      server: 'Something went wrong on our side',
+      notFound: 'We can’t find that',
+      wait: 'Please wait',
+      fixInput: 'Check and try again',
+      forbidden: 'You can’t do that',
+    },
+    offline: 'Check your connection and try again.',
+    server: 'Try again. If it keeps happening, contact Skipa support with this reference.',
+  },
+} as const;

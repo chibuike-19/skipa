@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Store dashboard: entry JS",
+    "path": "dist/assets/index-*.js",
+    "gzip": true,
+    "limit": "250 KB"
+  },
+  {
+    "name": "Store dashboard: all route chunks together (brief §12: each < 250 KB gz)",
+    "path": ["dist/assets/*.js", "!dist/assets/index-*.js", "!dist/assets/sentry-*.js"],
+    "gzip": true,
+    "limit": "250 KB"
+  },
+  {
+    "name": "Error reporting chunk, loaded after first paint",
+    "path": "dist/assets/sentry-*.js",
+    "gzip": true,
+    "limit": "35 KB"
+  }
+]

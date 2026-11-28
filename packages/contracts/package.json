@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "sideEffects": false,
   "description": "Zod schemas that generate api/openapi.v1.yaml, the error-code catalogue and the analytics event names.",
   "exports": {
     "./errors": "./src/errors.ts",

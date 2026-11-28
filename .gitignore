@@ -22,3 +22,8 @@ keys.txt
 
 # Ansible collections installed locally from infra/ansible/requirements.yml
 infra/ansible/.collections/
+
+# Lighthouse CI run output
+.lighthouseci/
+# TanStack Router plugin cache
+.tanstack/

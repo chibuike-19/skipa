@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en-NG">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#23336B" />
+    <title>Skipa</title>
+    <link rel="icon" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <script>
+      // AD-11, NF-21: Opera Mini can't run the app. Send it to a plain page before the bundle loads.
+      if (/Opera Mini|OPiM/.test(navigator.userAgent)) {
+        location.replace(
+          '/open-in-chrome.html?from=' + encodeURIComponent(location.pathname + location.search),
+        );
+      }
+    </script>
+  </head>
+  <body class="bg-page">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

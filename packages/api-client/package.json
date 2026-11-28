@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "sideEffects": false,
   "description": "Typed client for api/openapi.v1.yaml: generated types, openapi-fetch factory, idempotency and realtime helpers.",
   "exports": {
     ".": "./src/index.ts",

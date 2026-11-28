@@ -2,6 +2,51 @@
 
 Updated at the end of every working session: done, next, blocked. Times are WAT.
 
+## 2026-11-28
+
+### Done — F0 Foundations complete (pending review and merge)
+
+| PR  | Item                                                                                                           | Status                                     |
+| --- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| #15 | `packages/tokens`: tokens.css v1.1 → CSS vars, Tailwind 4 `@theme`, `tokens.ts`; self-hosted Inter + Bricolage | CI green, awaiting review                  |
+| #16 | `packages/mocks`: MSW handlers, scenarios, fake SSE, `mocks:validate` against the contract                     | CI green, awaiting review                  |
+| #17 | `packages/api-client`: generated types, client, idempotency, realtime (SSE + polling)                          | CI green, awaiting review (stacked on #16) |
+| #18 | `packages/ui`: core components, gallery, Playwright screenshots in three brand modes, axe, no-raw-colour lint  | CI green, awaiting review (stacked on #15) |
+| #19 | App shells (shopper, exit, store, admin) + CI `apps` job (builds, size-limit, Lighthouse)                      | CI running (stacked on #18, merges #17)    |
+
+F0 acceptance criteria:
+
+- Gallery matches canvas components in all three brand modes: screenshot baselines committed (#18).
+- No raw hex in `packages/ui`: Stylelint `color-no-hex` + ESLint rule (#18).
+- Mocks validate against the contract: `pnpm mocks:validate` in the `contract` CI job (#16).
+- Shopper shell < 120 KB gz: **117.7 KB** entry JS; first load 188 KB gz (< 500 KB). Lighthouse
+  (mobile, 3G, 4× CPU): TTI 0.75 s, accessibility 1.0.
+
+Shells: routing, sessions (shopper device + guest; staff email + code sign-in, guard with return
+path, AUTH-001 ends the session), every catalogue error code mapped with reference, GlitchTip via
+the tunnel (SDK loaded after first paint), copy in `i18n/en.ts`, `pnpm dev:mocks` for all four.
+
+### Next
+
+- Merge order: #15 → #18, #16 → #17, then #19.
+- F1 (Skipa home and entry): home 4 tabs, store search, check-in states, registration/sign-in,
+  consents, tours, install prompt.
+
+### Blocked / waiting on the lead
+
+- Defaults from 26 Nov applied (no answer by 28 Nov): build/test dev dependencies added;
+  jsx-a11y loaded through `@eslint/compat`; openapi-typescript on TypeScript 6 (ADR-36); lint and
+  CI changes made by PR to the shared files.
+- **Exit sign-in transport.** AD §5 says web apps use the httpOnly cookie, but the sessions row
+  says "Native/exit devices: `Authorization: Bearer`". The exit shell uses the cookie (it is a web
+  app at `exit.skipa.ng`). Default if unanswered by **2 Dec 2026**: keep the cookie.
+- Sign-in forms in the staff shells are working placeholders on shared components; they are
+  matched to Exit-F01, SD-Signin and SA-Signin in F4/F5/F6.
+
+### Contract
+
+- No change proposed.
+
 ## 2026-11-26
 
 ### Done

@@ -1,0 +1,68 @@
+// All super-admin copy (brief §4, §16): plain English from the canvas content guide (F-Content).
+export const en = {
+  app: { name: 'Skipa super admin' },
+  common: {
+    tryAgain: 'Try again',
+    goHome: 'Go to Overview',
+    reference: 'Reference',
+    signOut: 'Sign out',
+  },
+  // SA-01: email and a 6-digit emailed code; the authenticator step (D-23) is built in F6.
+  signIn: {
+    title: 'Sign in to Skipa admin',
+    emailLabel: 'Work email',
+    emailHint: 'We’ll email you a 6-digit code.',
+    sendCode: 'Email me a code',
+    codeTitle: 'Enter the code',
+    codeBody: (to: string) => `We sent a 6-digit code to ${to}.`,
+    codeLabel: 'Code',
+    digit: (i: number) => `Digit ${i}`,
+    verify: 'Sign in',
+    changeEmail: 'Use a different email',
+    secondStep: 'Enter the code from your authenticator app. This step is built in F6.',
+  },
+  nav: {
+    label: 'Super admin',
+    product: 'Super admin',
+    overview: 'Overview',
+    stores: 'Stores',
+    shoppers: 'Shoppers',
+    transactions: 'Transactions',
+    disputes: 'Disputes',
+    reconciliation: 'Reconciliation',
+    billing: 'Billing',
+    loss: 'Loss',
+    analytics: 'Analytics',
+    errors: 'Errors',
+    support: 'Support',
+    alerts: 'Alerts',
+    config: 'Config',
+    users: 'Users',
+    audit: 'Audit log',
+    branding: 'Branding',
+    loyalty: 'Loyalty',
+  },
+  // F0 shell: each section is built in F6.
+  shell: {
+    signedInAs: (name: string) => `Signed in as ${name}`,
+    placeholder: 'This section is built in F6.',
+  },
+  notFound: {
+    title: 'We can’t find that page',
+    body: 'The link may be old. Use the menu to find what you need.',
+  },
+  errors: {
+    titles: {
+      retry: 'That didn’t work',
+      signIn: 'Please sign in again',
+      offline: 'You’re offline',
+      server: 'Something went wrong on our side',
+      notFound: 'We can’t find that',
+      wait: 'Please wait',
+      fixInput: 'Check and try again',
+      forbidden: 'You can’t do that',
+    },
+    offline: 'Check your connection and try again.',
+    server: 'Try again. If it keeps happening, check Errors for this reference.',
+  },
+} as const;
