@@ -1,0 +1,28 @@
+{
+  "name": "@skipa/tokens",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Design tokens v1.1 from the Claude Design canvas → CSS variables, Tailwind 4 @theme and a TypeScript object.",
+  "exports": {
+    ".": "./dist/tokens.ts",
+    "./tokens.css": "./dist/tokens.css",
+    "./tailwind-theme.css": "./dist/tailwind-theme.css",
+    "./fonts.css": "./dist/fonts.css",
+    "./fonts/*": "./fonts/*"
+  },
+  "scripts": {
+    "build": "node scripts/build.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@skipa/config": "workspace:*",
+    "@tailwindcss/node": "4.3.5",
+    "@types/node": "24.19.2",
+    "postcss": "8.5.33",
+    "tailwindcss": "4.3.5",
+    "typescript": "7.0.2",
+    "vitest": "5.1.1"
+  }
+}

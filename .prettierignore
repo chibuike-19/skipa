@@ -12,3 +12,5 @@ packages/mocks/src/generated/
 packages/mocks/fixtures/
 # Generated from the contract by `pnpm api-client:gen`; a test compares it byte for byte.
 packages/api-client/src/generated/
+# Copied verbatim from the Claude Design canvas (tokens.css v1.1); a design update replaces the file.
+packages/tokens/src/tokens.css
