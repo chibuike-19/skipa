@@ -91,6 +91,36 @@ jobs:
             packages/ui/dist/playwright-report
             packages/ui/dist/test-results
 
+  apps:
+    # Frontend (brief §7 F0, §12): production builds of the four web apps, bundle budgets
+    # (size-limit: shopper shell < 120 KB gz, first load < 500 KB gz; dashboard chunks < 250 KB gz)
+    # and Lighthouse CI on the shopper build (mobile, 3G 1.6 Mbps / 150 ms, 4× CPU: interactive
+    # < 4 s, accessibility ≥ 0.95). Uses the runner's Chrome.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          # pnpm comes from corepack in a later step.
+          package-manager-cache: false
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - name: Build the four apps
+        run: >-
+          pnpm turbo run build
+          --filter=@skipa/shopper --filter=@skipa/exit --filter=@skipa/store --filter=@skipa/admin
+      - name: Bundle budgets
+        run: pnpm size
+      - name: Lighthouse CI (shopper)
+        run: pnpm lhci
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-shopper
+          path: apps/shopper/dist/lhci
+
   integration:
     # Real Postgres 18.7, every migration applied to an empty database, then the int suite
     # (append-only, partial unique indexes, RLS isolation, Drizzle schema drift).
