@@ -23,7 +23,8 @@
     "local:setup": "pnpm local:env && pnpm db:up && pnpm db:migrate && pnpm db:seed",
     "contract:build": "pnpm --filter @skipa/contracts contract:build",
     "contract:check": "pnpm --filter @skipa/contracts contract:check",
-    "db:seed": "pnpm --filter @skipa/api db:seed"
+    "db:seed": "pnpm --filter @skipa/api db:seed",
+    "tokens:build": "pnpm --filter @skipa/tokens build"
   },
   "devDependencies": {
     "@commitlint/cli": "21.2.4",
