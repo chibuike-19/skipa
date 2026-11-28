@@ -45,6 +45,52 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
 
+  ui:
+    # Frontend (brief §7 F0, §8.2, §13): CSS colour lint, then the component gallery screenshotted in
+    # the three brand modes (Skipa, Adunni Mart, Harbour Grocers) with axe on every page and overlay.
+    # Runs in the Playwright image on x64 so screenshots render the same way every run. Missing
+    # baselines are written and uploaded as the `ui-screenshots` artifact, and the job fails until
+    # they are reviewed and committed to packages/ui/e2e/__screenshots__.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.1-noble
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          # pnpm comes from corepack in a later step.
+          package-manager-cache: false
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint:css
+      - run: pnpm tokens:build
+      - name: Gallery screenshots (three brand modes) and axe
+        working-directory: packages/ui
+        run: pnpm exec playwright test -c e2e/playwright.config.ts --update-snapshots=missing
+      - name: Screenshot baselines are committed
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          new=$(git status --porcelain --untracked-files=all packages/ui/e2e/__screenshots__)
+          if [ -n "$new" ]; then
+            echo "::error::New screenshot baselines were written. Download the ui-screenshots artifact, compare with the canvas, and commit them."
+            echo "$new"
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-screenshots
+          path: packages/ui/e2e/__screenshots__
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: ui-playwright-report
+          path: |
+            packages/ui/dist/playwright-report
+            packages/ui/dist/test-results
+
   integration:
     # Real Postgres 18.7, every migration applied to an empty database, then the int suite
     # (append-only, partial unique indexes, RLS isolation, Drizzle schema drift).

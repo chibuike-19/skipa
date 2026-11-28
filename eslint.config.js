@@ -1,4 +1,4 @@
-import { base } from '@skipa/config/eslint';
+import { base, react } from '@skipa/config/eslint';
 
 export default [
   {
@@ -8,7 +8,9 @@ export default [
       '**/coverage/**',
       '**/.turbo/**',
       'docs/architecture-pack/**',
+      'packages/ui/e2e/__screenshots__/**',
     ],
   },
   ...base,
+  ...react,
 ];
